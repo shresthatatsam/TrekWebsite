@@ -1,0 +1,237 @@
+﻿@using Microsoft.AspNetCore.Identity;
+@inject SignInManager<Users> signInManager;
+<style>
+    /* Reset margin/padding and set font */
+    body, html {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    /* Navbar */
+    nav.navbar {
+        position: fixed;
+        width: 100%;
+        z-index: 3000;
+        background: rgba(0, 0, 0, 0.75);
+        padding: 0.5rem 1rem;
+    }
+
+    .navbar-brand, .navbar-nav .nav-link {
+        color: #ffffff !important;
+        font-weight: 600;
+        transition: color 0.3s ease;
+    }
+
+        .navbar-brand:hover, .navbar-nav .nav-link:hover {
+            color: #00d1b2 !important; /* nice teal accent */
+        }
+
+    /* Navbar toggler */
+    .navbar-toggler {
+        border-color: #00d1b2;
+    }
+
+   
+
+    /* Carousel height full viewport */
+    #introCarousel,
+    .carousel-inner,
+    .carousel-item,
+    .carousel-item.active {
+        height: 100vh;
+    }
+
+        /* Carousel background images */
+        .carousel-item:nth-child(1) {
+            background: url('https://mdbootstrap.com/img/Photos/Others/images/76.jpg') no-repeat center center/cover;
+        }
+
+        .carousel-item:nth-child(2) {
+            background: url('https://mdbootstrap.com/img/Photos/Others/images/77.jpg') no-repeat center center/cover;
+        }
+
+        .carousel-item:nth-child(3) {
+            background: url('https://mdbootstrap.com/img/Photos/Others/images/78.jpg') no-repeat center center/cover;
+        }
+
+        /* Overlay masks */
+        .carousel-item .mask {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+        }
+
+        .carousel-item:nth-child(1) .mask {
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .carousel-item:nth-child(2) .mask {
+            background-color: rgba(0, 0, 0, 0.35);
+        }
+
+        .carousel-item:nth-child(3) .mask {
+            background: linear-gradient( 45deg, rgba(29, 236, 197, 0.7), rgba(91, 14, 214, 0.7) 100% );
+        }
+
+        /* Carousel content */
+        .carousel-item .text-white {
+            position: relative;
+            z-index: 10;
+        }
+
+        .carousel-item h1,
+        .carousel-item h2,
+        .carousel-item h5 {
+            margin-bottom: 1rem;
+            text-shadow: 1px 1px 6px rgba(0,0,0,0.7);
+        }
+
+    /* Buttons */
+    .btn-outline-light {
+        border-color: #00d1b2;
+        color: #00d1b2;
+        transition: all 0.3s ease;
+    }
+
+        .btn-outline-light:hover {
+            background-color: #00d1b2;
+            color: #fff;
+            border-color: #00d1b2;
+        }
+
+    /* Responsive text sizing */
+    media (max-width: 768px) {
+        .carousel-item h1
+
+    {
+        font-size: 1.8rem;
+    }
+
+    .carousel-item h2 {
+        font-size: 1.4rem;
+    }
+
+    .carousel-item h5 {
+        font-size: 1rem;
+    }
+
+    }
+
+    .navbar-toggler-icon {
+        background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='%23fff' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
+    }
+
+</style>
+
+<header>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="https://mdbootstrap.com/docs/standard/" target="_blank" rel="noopener">MDB</a>
+            <button class="navbar-toggler" type="button" data-mdb-toggle="collapse" data-mdb-target="#navbarExample01"
+                    aria-controls="navbarExample01" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarExample01">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item active"><a class="nav-link" href="#intro">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="https://www.youtube.com/channel/UC5CF7mLQZhvx8O5GODZAhdA" target="_blank" rel="nofollow noopener">Learn Bootstrap 5</a></li>
+                    <li class="nav-item"><a class="nav-link" href="https://mdbootstrap.com/docs/standard/" target="_blank" rel="noopener">Download MDB UI KIT</a></li>
+                </ul>
+         
+            @*     <ul class="navbar-nav list-inline mb-0">
+                    <li class="nav-item"><a class="nav-link" href="https://www.youtube.com/channel/UC5CF7mLQZhvx8O5GODZAhdA" target="_blank" rel="nofollow noopener"><i class="fab fa-youtube"></i></a></li>
+                    <li class="nav-item"><a class="nav-link" href="https://www.facebook.com/mdbootstrap" target="_blank" rel="nofollow noopener"><i class="fab fa-facebook-f"></i></a></li>
+                    <li class="nav-item"><a class="nav-link" href="https://twitter.com/MDBootstrap" target="_blank" rel="nofollow noopener"><i class="fab fa-twitter"></i></a></li>
+                    <li class="nav-item"><a class="nav-link" href="https://github.com/mdbootstrap/mdb-ui-kit" target="_blank" rel="nofollow noopener"><i class="fab fa-github"></i></a></li>
+                </ul> *@
+
+                <ul class="navbar-nav mr-auto mb-2 mb-lg-0">
+                    @if (signInManager.IsSignedIn(User))
+                    {
+                        <li class="nav-item">
+                            <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn btn-link nav-link text-dark p-0">Logout</button>
+                            </form>
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-controller="Account" asp-action="Login">
+                                Login
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-controller="Account" asp-action="Register">
+                                Register
+                            </a>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Carousel -->
+    <div id="introCarousel" class="carousel slide carousel-fade shadow-2-strong" data-mdb-ride="carousel">
+        <!-- Indicators -->
+        <div class="carousel-indicators">
+            <button type="button" data-mdb-target="#introCarousel" data-mdb-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+            <button type="button" data-mdb-target="#introCarousel" data-mdb-slide-to="1" aria-label="Slide 2"></button>
+            <button type="button" data-mdb-target="#introCarousel" data-mdb-slide-to="2" aria-label="Slide 3"></button>
+        </div>
+
+        <!-- Inner -->
+        <div class="carousel-inner">
+            <div class="carousel-item active">
+                <div class="mask">
+                    <div class="d-flex justify-content-center align-items-center h-100">
+                        <div class="text-white text-center">
+                            <h1>Learn Bootstrap 5 with MDB</h1>
+                            <h5>Best & free guide of responsive web design</h5>
+                            <a class="btn btn-outline-light btn-lg m-2" href="https://www.youtube.com/watch?v=c9B4TPnak1A" target="_blank" rel="nofollow noopener">Start tutorial</a>
+                            <a class="btn btn-outline-light btn-lg m-2" href="https://mdbootstrap.com/docs/standard/" target="_blank" rel="noopener">Download MDB UI KIT</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="carousel-item">
+                <div class="mask">
+                    <div class="d-flex justify-content-center align-items-center h-100">
+                        <div class="text-white text-center">
+                            <h2>You can place here any content</h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="carousel-item">
+                <div class="mask">
+                    <div class="d-flex justify-content-center align-items-center h-100">
+                        <div class="text-white text-center">
+                            <h2>And cover it with any mask</h2>
+                            <a class="btn btn-outline-light btn-lg m-2" href="https://mdbootstrap.com/docs/standard/content-styles/masks/" target="_blank" rel="noopener">Learn about masks</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Controls -->
+        <button class="carousel-control-prev" type="button" data-mdb-target="#introCarousel" data-mdb-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-mdb-target="#introCarousel" data-mdb-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+        </button>
+    </div>
+</header>

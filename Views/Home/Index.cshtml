@@ -1,0 +1,12 @@
+﻿@using UserRoles.Dtos.ResponseDtos;
+@{
+    var carouselImages = ViewBag.CarouselImages as List<CarousalImageResponseDto>;
+
+    var AboutUs = ViewBag.aboutUs as AboutUsResponseDto;
+}
+
+
+@await Html.PartialAsync("_Navbar")
+@await Html.PartialAsync("_Carousel", carouselImages)
+@await Html.PartialAsync("_HomeAboutUs" , AboutUs)
+@await Html.PartialAsync("_DealsPartialLayout")

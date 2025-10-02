@@ -1,0 +1,51 @@
+﻿@model UserRoles.Dtos.RequestDtos.AboutUsRequestDto
+
+@{
+    ViewData["Title"] = "Create About Us";
+}
+
+<div class="container mt-5">
+    <div class="card shadow-lg rounded-4">
+        <div class="card-header bg-primary text-white text-center rounded-top-4">
+            <h2 class="mb-0">@ViewData["Title"]</h2>
+        </div>
+        <div class="card-body p-4">
+            <form asp-action="Create" asp-controller="AboutUs" method="post" enctype="multipart/form-data">
+                <div class="mb-3">
+                    <label asp-for="Title" class="form-label fw-semibold">Title</label>
+                    <input asp-for="Title" class="form-control" placeholder="Enter title" />
+                    <span asp-validation-for="Title" class="text-danger small"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Mission" class="form-label fw-semibold">Mission</label>
+                    <textarea asp-for="Mission" class="form-control" rows="3" placeholder="Enter mission statement"></textarea>
+                    <span asp-validation-for="Mission" class="text-danger small"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Story" class="form-label fw-semibold">Story</label>
+                    <textarea asp-for="Story" class="form-control" rows="4" placeholder="Write your story..."></textarea>
+                    <span asp-validation-for="Story" class="text-danger small"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="ImageFile" class="form-label fw-semibold">Image</label>
+                    <input asp-for="ImageFile" type="file" class="form-control" />
+                    <span asp-validation-for="ImageFile" class="text-danger small"></span>
+                </div>
+
+                <div class="text-center mt-4">
+                    <button type="submit" class="btn btn-success px-4 py-2 rounded-pill">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
+

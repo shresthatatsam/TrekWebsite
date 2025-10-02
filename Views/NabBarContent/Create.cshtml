@@ -1,0 +1,80 @@
+﻿@model UserRoles.Models.NabBarContent
+
+@{
+    ViewData["Title"] = "Create Navigation Bar";
+}
+
+<h2>Create Navigation Bar</h2>
+
+<form asp-action="Create" method="post">
+    <div class="form-group">
+        <label asp-for="MainHeading" class="control-label"></label>
+        <input asp-for="MainHeading" class="form-control" />
+        <span asp-validation-for="MainHeading" class="text-danger"></span>
+    </div>
+
+    <h4>Nav Items</h4>
+
+    <div id="navItems">
+        <!-- Initial NavItem -->
+        <div class="nav-item-block border p-3 mb-3" data-index="0">
+            <div class="form-group">
+                <label>Title</label>
+                <input name="Items[0].Title" class="form-control" />
+            </div>
+            <div class="form-group">
+                <label>Slug</label>
+                <input name="Items[0].Slug" class="form-control" />
+            </div>
+            <div class="form-group">
+                <label>URL</label>
+                <input name="Items[0].Url" class="form-control" />
+            </div>
+        </div>
+    </div>
+
+    <button type="button" class="btn btn-outline-secondary mb-3" onclick="addNavItem()">+ Add More</button>
+
+    <br />
+
+    <button type="submit" class="btn btn-primary">Create</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        let navItemIndex = 1; // Starts from 1 since 0 is already added
+
+        function addNavItem() {
+            const container = document.getElementById("navItems");
+
+            const itemHtml = `
+            <div class="nav-item-block border p-3 mb-3" data-index="${navItemIndex}">
+                <div class="form-group">
+                    <label>Title</label>
+                    <input name="Items[${navItemIndex}].Title" class="form-control" />
+                </div>
+                <div class="form-group">
+                    <label>Slug</label>
+                    <input name="Items[${navItemIndex}].Slug" class="form-control" />
+                </div>
+                <div class="form-group">
+                    <label>URL</label>
+                    <input name="Items[${navItemIndex}].Url" class="form-control" />
+                </div>
+                <button type="button" class="btn btn-danger btn-sm mt-2" onclick="removeNavItem(this)">Remove</button>
+            </div>
+            `;
+
+            container.insertAdjacentHTML("beforeend", itemHtml);
+            navItemIndex++;
+        }
+
+        function removeNavItem(button) {
+            const block = button.closest(".nav-item-block");
+            block.remove();
+        }
+    </script>
+}

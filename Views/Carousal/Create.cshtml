@@ -1,0 +1,57 @@
+﻿@model UserRoles.Dtos.RequestDtos.CarousalImageRequestDto
+
+@{
+    ViewData["Title"] = "Upload Carousel Image";
+}
+
+<div class="container mt-5">
+    <div class="card shadow rounded-4">
+        <div class="card-header bg-primary text-white text-center rounded-top-4">
+            <h2 class="mb-0">@ViewData["Title"]</h2>
+        </div>
+        <div class="card-body p-4">
+            <form asp-action="Create" method="post" enctype="multipart/form-data">
+                <div class="mb-3">
+                    <label asp-for="ImageFile" class="form-label fw-semibold">Image</label>
+                    <input asp-for="ImageFile" type="file" class="form-control" />
+                    <span asp-validation-for="ImageFile" class="text-danger small"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Caption" class="form-label fw-semibold">Caption</label>
+                    <input asp-for="Caption" class="form-control" placeholder="Enter main caption" />
+                    <span asp-validation-for="Caption" class="text-danger small"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="SubCaption" class="form-label fw-semibold">Sub Caption</label>
+                    <input asp-for="SubCaption" class="form-control" placeholder="Enter sub caption" />
+                    <span asp-validation-for="SubCaption" class="text-danger small"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="carousalEnum" class="form-label fw-semibold">Carousel Type</label>
+                    <select asp-for="carousalEnum" asp-items="Html.GetEnumSelectList<CarousalEnum>()" class="form-select">
+                        <option value="">-- Select Type --</option>
+                    </select>
+                    <span asp-validation-for="carousalEnum" class="text-danger small"></span>
+                </div>
+
+                <div class="form-check mb-4">
+                    <input asp-for="IsActive" class="form-check-input" />
+                    <label asp-for="IsActive" class="form-check-label">Is Active</label>
+                </div>
+
+                <div class="text-center">
+                    <button type="submit" class="btn btn-success px-4 py-2 rounded-pill">Upload</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

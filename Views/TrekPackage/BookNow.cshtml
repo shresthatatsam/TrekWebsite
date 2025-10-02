@@ -1,0 +1,321 @@
+﻿@using System.Text.Json
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Trip Booking Form</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+
+        .container {
+            display: flex;
+            max-width: 1200px;
+            margin: auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            gap: 20px;
+        }
+
+        .left, .right {
+            flex: 1;
+        }
+
+        h3, h4 {
+            margin-top: 0;
+            color: #333;
+        }
+
+        .section {
+            margin-bottom: 30px;
+        }
+
+        select, input[type="date"], input, textarea {
+            padding: 10px;
+            font-size: 14px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            width: 100%;
+        }
+
+        .input-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+            .input-row > div {
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+            }
+
+        .dob-select {
+            display: flex;
+            gap: 10px;
+        }
+
+        .continue-button {
+            margin-top: 20px;
+            background-color: #00bfa5;
+            color: white;
+            border: none;
+            padding: 15px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+        }
+
+            .continue-button:hover {
+                background-color: #009e88;
+            }
+
+        .booking-summary {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        .summary-line {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid #ccc;
+            margin: 10px 0;
+        }
+
+        .traveler-section {
+            border: 1px solid #ccc;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            background: #fafafa;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- LEFT COLUMN -->
+        <div class="left">
+            <div class="section">
+                <h3>Select Departure</h3>
+                <div style="display: flex; gap: 20px; align-items: center;">
+                    <div style="flex: 1;">
+                        <label for="start-date">Start Date</label>
+                        <input type="date" id="start-date" required style="width: 100%;">
+                    </div>
+                    <div style="flex: 1;">
+                        <label for="end-date">End Date (@ViewBag.TripDuration Days Trip)</label>
+                        <input type="text" id="end-date" readonly style="width: 100%;">
+                    </div>
+                </div>
+                <label for="people" style="margin-top: 15px; display: block;">Select Number of People</label>
+                <select id="people" name="people">
+                    @for (int i = 1; i <= 25; i++)
+                    {
+                        <option value="@i">@i @(i == 1 ? "Person" : "People")</option>
+                    }
+                </select>
+                <p id="price-note" style="color: #00bfa5; font-weight: bold; margin-top: 5px;"></p>
+            </div>
+
+            <div class="section">
+                <h3>Traveler Information</h3>
+                <form id="traveler-form">
+                    <div id="traveler-container"></div>
+                    <button type="submit" class="continue-button">Continue</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- RIGHT COLUMN -->
+        <div class="right">
+            <div class="booking-summary">
+                <h4>Your Booking</h4>
+                <div class="summary-line"><span id="summary-dates">Not selected</span></div>
+                <div class="summary-line"><span id="summary-people">0 Pax</span><span id="summary-price">$0.00</span></div>
+                <hr />
+                <div class="summary-line"><strong>Trip Total:</strong><strong id="summary-total">$0.00</strong></div>
+                <div class="summary-line"><span>Due at Booking (30%):</span><strong id="summary-deposit">$0.00</strong></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://js.stripe.com/v3/"></script>
+    <script>
+        const startDateInput = document.getElementById("start-date");
+        const endDateInput = document.getElementById("end-date");
+        const peopleSelect = document.getElementById("people");
+        const summaryDates = document.getElementById("summary-dates");
+        const summaryPeople = document.getElementById("summary-people");
+        const summaryPrice = document.getElementById("summary-price");
+        const summaryTotal = document.getElementById("summary-total");
+        const summaryDeposit = document.getElementById("summary-deposit");
+        const travelerContainer = document.getElementById("traveler-container");
+        const priceNote = document.getElementById("price-note");
+        const travelerForm = document.getElementById("traveler-form");
+
+        const tripDuration = @ViewBag.TripDuration;
+        const priceMap = @Html.Raw(JsonSerializer.Serialize(ViewBag.PriceMap));
+        const stripePublicKey = '@ViewBag.StripePublishableKey';
+
+        const today = new Date().toISOString().split("T")[0];
+        startDateInput.setAttribute("min", today);
+
+        function calculateEndDate(start, days) {
+            const date = new Date(start);
+            date.setDate(date.getDate() + days);
+            return date.toISOString().split("T")[0];
+        }
+
+        function getPricePerPerson(count) {
+            const group = priceMap.find(g => count >= g.min && count <= g.max);
+            return group ? group.price : 0;
+        }
+
+        function updateSummary() {
+            const start = startDateInput.value;
+            const peopleCount = parseInt(peopleSelect.value);
+
+            if (start && peopleCount) {
+                const end = calculateEndDate(start, tripDuration);
+                endDateInput.value = end;
+
+                const pricePerPerson = getPricePerPerson(peopleCount);
+                const total = pricePerPerson * peopleCount;
+                const deposit = Math.round(total * 0.3);
+
+                summaryDates.textContent = `${start} → ${end}`;
+                summaryPeople.textContent = `${peopleCount} Pax`;
+                summaryPrice.textContent = `$${pricePerPerson.toLocaleString()}`;
+                summaryTotal.textContent = `$${total.toLocaleString()}`;
+                summaryDeposit.textContent = `$${deposit.toLocaleString()}`;
+                priceNote.textContent = `Price per person for ${peopleCount} pax: $${pricePerPerson.toLocaleString()}`;
+            }
+        }
+
+        function generateTravelerForms(count) {
+            travelerContainer.innerHTML = "";
+            const currentYear = new Date().getFullYear();
+            const minYear = currentYear - 100;
+
+            for (let i = 1; i <= count; i++) {
+                const travelerDiv = document.createElement("div");
+                travelerDiv.classList.add("traveler-section");
+
+                travelerDiv.innerHTML = `
+                    <h4>Traveler ${i}</h4>
+                    <div class="input-row">
+                        <div><label>First Name *</label><input type="text" name="traveler[${i}][firstName]" required /></div>
+                        <div><label>Last Name *</label><input type="text" name="traveler[${i}][lastName]" required /></div>
+                        <div><label>Email *</label><input type="email" name="traveler[${i}][email]" required /></div>
+                    </div>
+                    <label>Date of Birth *</label>
+                    <div class="dob-select">
+                        <select name="traveler[${i}][dobMonth]" required>
+                            <option>Month</option><option>January</option><option>February</option><option>March</option>
+                            <option>April</option><option>May</option><option>June</option><option>July</option>
+                            <option>August</option><option>September</option><option>October</option>
+                            <option>November</option><option>December</option>
+                        </select>
+                        <select name="traveler[${i}][dobDay]" required>
+                            <option>Day</option>${Array.from({length:31}, (_,d)=>`<option>${d+1}</option>`).join("")}
+                        </select>
+                        <select name="traveler[${i}][dobYear]" required>
+                            <option>Year</option>${Array.from({length: currentYear - minYear + 1}, (_,y)=>`<option>${currentYear - y}</option>`).join("")}
+                        </select>
+                    </div>
+                    <div class="input-row">
+                        <div><label>Gender *</label><input type="text" name="traveler[${i}][gender]" required /></div>
+                        <div><label>Phone Number *</label><input type="tel" name="traveler[${i}][phone]" required /></div>
+                    </div>
+                    <div class="input-row">
+                        <div><label>Nationality *</label><input type="text" name="traveler[${i}][nationality]" required /></div>
+                        <div><label>Passport Number *</label><input type="text" name="traveler[${i}][passportNumber]" required /></div>
+                    </div>
+                `;
+                travelerContainer.appendChild(travelerDiv);
+            }
+        }
+
+        startDateInput.addEventListener("change", updateSummary);
+        peopleSelect.addEventListener("change", () => {
+            updateSummary();
+            generateTravelerForms(parseInt(peopleSelect.value));
+        });
+
+        // Initial load
+        startDateInput.value = today;
+        updateSummary();
+        generateTravelerForms(parseInt(peopleSelect.value));
+
+        // Handle form submission
+        travelerForm.addEventListener("submit", async function(e) {
+            e.preventDefault();
+
+            const formData = new FormData(travelerForm);
+            const travelers = [];
+            const peopleCount = parseInt(peopleSelect.value);
+
+            for (let i=1; i<=peopleCount; i++) {
+                travelers.push({
+                    firstName: formData.get(`traveler[${i}][firstName]`),
+                    lastName: formData.get(`traveler[${i}][lastName]`),
+                    email: formData.get(`traveler[${i}][email]`),
+                    dobMonth: formData.get(`traveler[${i}][dobMonth]`),
+                    dobDay: formData.get(`traveler[${i}][dobDay]`),
+                    dobYear: formData.get(`traveler[${i}][dobYear]`),
+                    gender: formData.get(`traveler[${i}][gender]`),
+                    phone: formData.get(`traveler[${i}][phone]`),
+                    nationality: formData.get(`traveler[${i}][nationality]`),
+                    passportNumber: formData.get(`traveler[${i}][passportNumber]`)
+                });
+            }
+
+            const tripData = {
+                startDate: startDateInput.value,
+                endDate: endDateInput.value,
+                peopleCount: peopleCount,
+                pricePerPerson: parseInt(summaryPrice.textContent.replace('$','').replace(',','')),
+                totalPrice: parseInt(summaryTotal.textContent.replace('$','').replace(',','')),
+                travelers: travelers
+            };
+
+            try {
+                const response = await fetch('/TrekPackage/BookAndPay', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(tripData)
+                });
+
+                const result = await response.json();
+                console.log(result);
+                if(result.sessionId) {
+                    const stripe = Stripe(stripePublicKey);
+                    await stripe.redirectToCheckout({ sessionId: result.sessionId });
+                } else {
+                    alert("Error processing payment. Please try again.");
+                }
+            } catch(err) {
+                console.error(err);
+                alert("An unexpected error occurred.");
+            }
+        });
+    </script>
+</body>
+</html>
+
+

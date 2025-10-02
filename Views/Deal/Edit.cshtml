@@ -1,0 +1,87 @@
+﻿@model UserRoles.Dtos.ResponseDtos.DealResponseDto
+
+@{
+    ViewData["Title"] = "Edit Deal";
+}
+
+<div class="container mt-5">
+    <div class="card shadow rounded-4">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center rounded-top-4">
+            <h2 class="mb-0">@ViewData["Title"]</h2>
+            <a asp-action="Index" class="btn btn-light text-dark rounded-pill px-3">Back to List</a>
+        </div>
+        <div class="card-body p-4">
+            <form asp-action="Edit" method="post" enctype="multipart/form-data">
+                <input type="hidden" asp-for="Id" />
+
+                <div class="mb-3">
+                    <label asp-for="Header" class="form-label fw-semibold">Header</label>
+                    <input asp-for="Header" class="form-control" placeholder="Enter deal header" />
+                    <span asp-validation-for="Header" class="text-danger small"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Caption" class="form-label fw-semibold">Caption</label>
+                    <input asp-for="Caption" class="form-control" placeholder="Enter main caption" />
+                    <span asp-validation-for="Caption" class="text-danger small"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="SubCaption" class="form-label fw-semibold">Sub Caption</label>
+                    <input asp-for="SubCaption" class="form-control" placeholder="Enter sub caption" />
+                    <span asp-validation-for="SubCaption" class="text-danger small"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Amount" class="form-label fw-semibold">Amount</label>
+                    <input asp-for="Amount" type="number" step="0.01" class="form-control" placeholder="Enter amount" />
+                    <span asp-validation-for="Amount" class="text-danger small"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Features" class="form-label fw-semibold">Features (one per line)</label>
+                    <textarea asp-for="Features" class="form-control" rows="4" placeholder="e.g.&#10;Round trip airfare&#10;4D/3N Twin share room&#10;Full board meals"></textarea>
+                    <span asp-validation-for="Features" class="text-danger small"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Details" class="form-label fw-semibold">Details</label>
+                    <textarea asp-for="Details" class="form-control" rows="4" placeholder="Enter details"></textarea>
+                    <span asp-validation-for="Details" class="text-danger small"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Current Image</label><br />
+                    @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                    {
+                        <img src="@Model.ImageUrl" alt="Current Deal Image" width="120" class="rounded shadow-sm mb-2" />
+                    }
+                    else
+                    {
+                        <p class="text-muted">No image uploaded.</p>
+                    }
+                </div>
+
+                
+
+                <div class="mb-3">
+                    <label for="ImageFile" class="form-label">Replace Image</label>
+                    <input type="file" name="ImageFile" id="ImageFile" class="form-control" accept="image/*" />
+                </div>
+
+                <div class="form-check mb-4">
+                    <input asp-for="Isactive" class="form-check-input" />
+                    <label asp-for="Isactive" class="form-check-label">Is Active</label>
+                </div>
+
+                <div class="text-center">
+                    <button type="submit" class="btn btn-primary px-4 py-2 rounded-pill">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

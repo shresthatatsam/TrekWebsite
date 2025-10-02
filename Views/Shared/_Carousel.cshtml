@@ -1,0 +1,134 @@
+﻿@using UserRoles.Dtos.ResponseDtos
+<style>
+	/* carousel.css */
+
+#introCarousel,
+.carousel-inner,
+.carousel-item,
+.carousel-item.active {
+    height: 100vh;
+}
+
+/* Carousel background images default fallback */
+/* These are optional if you dynamically load images in the carousel */
+.carousel-item:nth-child(1) {
+    background: url('https://mdbootstrap.com/img/Photos/Others/images/76.jpg') no-repeat center center/cover;
+}
+
+.carousel-item:nth-child(2) {
+    background: url('https://mdbootstrap.com/img/Photos/Others/images/77.jpg') no-repeat center center/cover;
+}
+
+.carousel-item:nth-child(3) {
+    background: url('https://mdbootstrap.com/img/Photos/Others/images/78.jpg') no-repeat center center/cover;
+}
+
+/* Overlay masks */
+.carousel-item .mask {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+
+.carousel-item:nth-child(1) .mask {
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.carousel-item:nth-child(2) .mask {
+    background-color: rgba(0, 0, 0, 0.35);
+}
+
+.carousel-item:nth-child(3) .mask {
+    background: linear-gradient( 45deg, rgba(29, 236, 197, 0.7), rgba(91, 14, 214, 0.7) 100% );
+}
+
+/* Carousel content */
+.carousel-item .text-white {
+    position: relative;
+    z-index: 10;
+}
+
+.carousel-item h1,
+.carousel-item h2,
+.carousel-item h5 {
+    margin-bottom: 1rem;
+    text-shadow: 1px 1px 6px rgba(0,0,0,0.7);
+}
+
+/* Buttons */
+.btn-outline-light {
+    border-color: #00d1b2;
+    color: #00d1b2;
+    transition: all 0.3s ease;
+}
+
+.btn-outline-light:hover {
+    background-color: #00d1b2;
+    color: #fff;
+    border-color: #00d1b2;
+}
+
+/* Responsive text sizing */
+media (max-width: 768px) {
+    .carousel-item h1 {
+        font-size: 1.8rem;
+    }
+
+    .carousel-item h2 {
+        font-size: 1.4rem;
+    }
+
+    .carousel-item h5 {
+        font-size: 1rem;
+    }
+}
+
+</style>
+
+
+@model List<CarousalImageResponseDto>
+
+
+@if (Model == null || !Model.Any())
+{
+    <p>No carousel images available.</p>
+}
+else
+{
+    <div id="introCarousel" class="carousel slide carousel-fade shadow-2-strong" data-mdb-ride="carousel">
+        <div class="carousel-indicators">
+            @for (var i = 0; i < Model.Count; i++)
+            {
+                <button type="button" data-mdb-target="#introCarousel" data-mdb-slide-to="@i" class="@(i == 0 ? "active" : "")" aria-current="@(i == 0 ? "true" : "false")" aria-label="Slide @(i + 1)"></button>
+            }
+        </div>
+
+        <div class="carousel-inner">
+            @for (var i = 0; i < Model.Count; i++)
+            {
+                var item = Model[i];
+                <div class="carousel-item @(i == 0 ? "active" : "")" style="background: url('@item.ImageUrl') no-repeat center center/cover;">
+                    <div class="mask" style="background-color: rgba(0, 0, 0, 0.5);">
+                        <div class="d-flex justify-content-center align-items-center h-100">
+                            <div class="text-white text-center">
+                                <h1>@item.Caption</h1>
+                                <h5>@item.SubCaption</h5>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <button class="carousel-control-prev" type="button" data-mdb-target="#introCarousel" data-mdb-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-mdb-target="#introCarousel" data-mdb-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+        </button>
+    </div>
+}

@@ -1,0 +1,138 @@
+﻿@using UserRoles.Services.Interface
+@inject ITrekAppService _trekPackageService
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.AspNetCore.Mvc.Rendering
+
+@{
+	var trekSlugs = await _trekPackageService.GetallSlug();
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>@ViewData["Title"] - UserRoles</title>
+	<link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+	<link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+	<link rel="stylesheet" href="~/UserRoles.styles.css" asp-append-version="true" />
+
+</head>
+<body>
+	<header>
+		<nav class="navbar navbar-expand-sm navbar-light bg-white border-bottom box-shadow mb-3">
+			<div class="container-fluid">
+				<a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">UserRoles</a>
+				<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse"
+						aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+					<span class="navbar-toggler-icon"></span>
+				</button>
+
+				<div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+					<ul class="navbar-nav flex-grow-1">
+
+						<!-- Trek Packages Dropdown -->
+						@if (User.IsInRole("Admin"))
+						{
+							<li class="nav-item dropdown">
+								<a class="nav-link dropdown-toggle" href="#" id="trekDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+									Trek Packages
+								</a>
+								<ul class="dropdown-menu" aria-labelledby="trekDropdown">
+									<li>
+										<a class="dropdown-item" asp-controller="TrekPackage" asp-action="Create">
+											Create Trek Package
+										</a>
+									</li>
+
+									<li>
+										<a class="dropdown-item" asp-controller="TrekPackage" asp-action="Index">
+											View Trek Package
+										</a>
+									</li>
+								</ul>
+							</li>
+							<li class="nav-item dropdown">
+								<a class="nav-link dropdown-toggle" href="#" id="Carousel" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+									Carousel
+								</a>
+								<ul class="dropdown-menu" aria-labelledby="Carousel">
+									<li>
+										<a class="dropdown-item" asp-controller="Carousal" asp-action="Create">
+											Create Carousal
+										</a>
+									</li>
+
+									<li>
+										<a class="dropdown-item" asp-controller="Carousal" asp-action="Index">
+											View Carousal
+										</a>
+									</li>
+								</ul>
+								
+							</li>
+
+							<li class="nav-item dropdown">
+								<a class="nav-link dropdown-toggle" href="#" id="AboutUs" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+									AboutUs
+								</a>
+								<ul class="dropdown-menu" aria-labelledby="AboutUs">
+									<li>
+										<a class="dropdown-item" asp-controller="AboutUs" asp-action="Create">
+											Create AboutUs
+										</a>
+									</li>
+
+									<li>
+										<a class="dropdown-item" asp-controller="AboutUs" asp-action="Index">
+											View AboutUs
+										</a>
+									</li>
+								</ul>
+
+							</li>
+						}
+						@if (!User.IsInRole("Admin"))
+						{
+							<li class="nav-item dropdown">
+								<a class="nav-link dropdown-toggle" href="#" id="trekDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+									Trek Packages
+								</a>
+								<ul class="dropdown-menu" aria-labelledby="trekDropdown">
+									@if (trekSlugs == null || !trekSlugs.Any())
+									{
+										<li><span class="dropdown-item text-danger">No slugs found</span></li>
+									}
+									else
+									{
+										foreach (var slug in trekSlugs)
+										{
+											<li>
+												<a class="dropdown-item" asp-controller="TrekPackage" asp-action="Details" asp-route-slug="@slug">
+													@slug
+												</a>
+											</li>
+										}
+									}
+								</ul>
+							</li>
+						}
+
+
+						<partial name="_LoginPartial" />
+					</ul>
+				</div>
+			</div>
+		</nav>
+	</header>
+
+	<main role="main" class="pb-3">
+		@RenderBody()
+	</main>
+
+	<script src="~/lib/jquery/dist/jquery.min.js"></script>
+	<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+	<script src="~/js/site.js" asp-append-version="true"></script>
+	@await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

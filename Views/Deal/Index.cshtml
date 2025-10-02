@@ -1,0 +1,79 @@
+﻿@model IEnumerable<UserRoles.Dtos.ResponseDtos.DealResponseDto>
+
+@{
+    ViewData["Title"] = "Deals List";
+}
+
+<div class="container mt-5">
+    <div class="card shadow rounded-4">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center rounded-top-4">
+            <h2 class="mb-0">@ViewData["Title"]</h2>
+            <a asp-action="Create" class="btn btn-success rounded-pill px-4">Add New Deal</a>
+        </div>
+        <div class="card-body p-4">
+          
+
+            <table class="table table-bordered table-striped align-middle text-center">
+                <thead class="bg-primary">
+                    <tr>
+                        <th>Image</th>
+                        <th>Header</th>
+                        <th>Caption</th>
+                        <th>Sub Caption</th>
+                        <th>Amount</th>
+
+                        <th>Features</th>
+                        <th>Is Active</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var deal in Model)
+                    {
+                        <tr>
+                            <td>
+                                @if (!string.IsNullOrEmpty(deal.ImageUrl))
+                                {
+                                    <img src="@deal.ImageUrl" alt="Deal Image" width="80" height="60" class="rounded shadow-sm" />
+                                }
+                            </td>
+                            <td>@deal.Header</td>
+                            <td>@deal.Caption</td>
+                            <td>@deal.SubCaption</td>
+                            <td>@deal.Amount.ToString("N2")</td>
+                            <td>
+                                <ul>
+                                    @foreach (var feature in deal.Features ?? new List<string>())
+                                    {
+                                        <li>@feature</li>
+                                    }
+                                </ul>
+                            </td>
+
+                            <td>
+                                @if (deal.Isactive)
+                                {
+                                    <span class="badge bg-success">Yes</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-danger">No</span>
+                                }
+                            </td>
+                            <td>
+                                <a asp-action="Edit" asp-route-id="@deal.Id" class="btn btn-sm btn-primary me-1">
+                                    <i class="bi bi-pencil-square"></i> Edit
+                                </a>
+                                <form asp-action="Delete" asp-route-id="@deal.Id" method="post" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this deal?');">
+                                    <button type="submit" class="btn btn-sm btn-danger">
+                                        <i class="bi bi-trash"></i> Delete
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

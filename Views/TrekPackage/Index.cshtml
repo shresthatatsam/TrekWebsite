@@ -1,0 +1,43 @@
+﻿@using UserRoles.Models.Trek
+@model IEnumerable<TrekPackage>
+
+@{
+    ViewData["Title"] = "Trek Packages";
+}
+
+
+@if (!(Model?.Any() ?? false))
+{
+    <div class="alert alert-info">No trek packages available.</div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-striped table-hover align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th>Name (Slug)</th>
+                    <th style="width: 180px;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var package in Model)
+                {
+                    <tr>
+                        <td>@package.Slug</td>
+                        <td>
+                            <a asp-action="Edit" asp-controller="TrekPackage" asp-route-slug="@package.Slug"
+                               class="btn btn-sm btn-warning me-2">
+                                Edit
+                            </a>
+                            <a asp-action="Details" asp-controller="TrekPackage" asp-route-slug="@package.Slug"
+                               class="btn btn-sm btn-primary">
+                                Details
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

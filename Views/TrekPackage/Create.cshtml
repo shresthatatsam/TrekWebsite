@@ -1,0 +1,1244 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Trek Package</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/tinymce@7.1.2/tinymce.min.js" referrerpolicy="origin"></script>
+    <style>
+        .progress-steps {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+            .progress-steps::before {
+                content: '';
+                position: absolute;
+                top: 20px;
+                left: 0;
+                right: 0;
+                height: 2px;
+                background: #e9ecef;
+                z-index: 1;
+            }
+
+        .step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+            background: white;
+            padding: 0 5px;
+            min-width: 90px;
+            text-align: center;
+        }
+
+        .step-number {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background: #e9ecef;
+            color: #6c757d;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-bottom: 8px;
+            font-size: 0.875rem;
+        }
+
+        .step.active .step-number {
+            background: #007bff;
+            color: white;
+        }
+
+        .step.completed .step-number {
+            background: #28a745;
+            color: white;
+        }
+
+        .step-title {
+            font-size: 0.75rem;
+            color: #6c757d;
+        }
+
+        .step.active .step-title {
+            color: #007bff;
+            font-weight: 600;
+        }
+
+        .step.completed .step-title {
+            color: #28a745;
+            font-weight: 600;
+        }
+
+        .form-step {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        keyframes fadeIn {
+            from
+
+        {
+            opacity: 0;
+            transform: translateX(20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        }
+
+        .image-preview {
+            position: relative;
+            display: inline-block;
+            margin: 10px;
+            border: 2px dashed #ccc;
+            border-radius: 8px;
+            padding: 10px;
+            background: #f9f9f9;
+        }
+
+            .image-preview img {
+                max-width: 200px;
+                max-height: 150px;
+                object-fit: cover;
+                border-radius: 4px;
+            }
+
+            .image-preview .remove-image {
+                position: absolute;
+                top: -10px;
+                right: -10px;
+                background: #dc3545;
+                color: white;
+                border: none;
+                border-radius: 50%;
+                width: 30px;
+                height: 30px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+        .form-label.required::after {
+            content: " *";
+            color: #dc3545;
+        }
+
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px 15px 0 0 !important;
+        }
+
+        .highlight-item, .itinerary-item, .inclusion-item, .exclusion-item, .faq-item, .packing-category-item {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+        }
+
+            .highlight-item:hover, .itinerary-item:hover, .inclusion-item:hover, .exclusion-item:hover, .faq-item:hover, .packing-category-item:hover {
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            }
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #007bff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        keyframes spin {
+            0%
+
+        {
+            transform: rotate(0deg);
+        }
+
+        100% {
+            transform: rotate(360deg);
+        }
+
+        }
+
+        .image-upload-zone {
+            border: 3px dashed #007bff;
+            border-radius: 15px;
+            padding: 40px 20px;
+            text-align: center;
+            background: linear-gradient(135deg, #f8f9ff 0%, #e3f2fd 100%);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+            .image-upload-zone:hover {
+                border-color: #0056b3;
+                background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            }
+
+            .image-upload-zone.dragover {
+                border-color: #28a745;
+                background: linear-gradient(135deg, #f0fff4 0%, #dcf5dc 100%);
+            }
+
+        .dynamic-item-list {
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+        }
+
+        .item-tag {
+            display: inline-block;
+            background: #e9ecef;
+            padding: 4px 8px;
+            margin: 2px;
+            border-radius: 4px;
+            font-size: 0.875rem;
+        }
+
+            .item-tag .remove-item {
+                margin-left: 5px;
+                color: #dc3545;
+                cursor: pointer;
+            }
+    </style>
+</head>
+<body>
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="text-center text-white">
+            <div class="spinner"></div>
+            <div class="mt-3">Processing your trek package...</div>
+        </div>
+    </div>
+
+    <div class="container-fluid py-4">
+        <div class="row justify-content-center">
+            <div class="col-12 col-xl-10">
+                <div class="card shadow-lg">
+                    <div class="card-header">
+                        <h3 class="card-title mb-0">
+                            <i class="fas fa-mountain"></i> Create Trek Package
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <form id="trekPackageForm" method="post" action="/TrekPackage/Create" enctype="multipart/form-data">
+                            <input type="hidden" id="selectedTrekId" name="Id" value="0" />
+
+                            <!-- Progress Steps -->
+                            <div class="row mb-8">
+                                <div class="col-12">
+                                    <div class="progress-steps">
+                                        <div class="step active" data-step="1">
+                                            <span class="step-number">1</span>
+                                            <span class="step-title">Basic Info</span>
+                                        </div>
+                                        <div class="step" data-step="2">
+                                            <span class="step-number">2</span>
+                                            <span class="step-title">Overview & Highlights</span>
+                                        </div>
+                                        <div class="step" data-step="3">
+                                            <span class="step-number">3</span>
+                                            <span class="step-title">Itinerary</span>
+                                        </div>
+                                        <div class="step" data-step="4">
+                                            <span class="step-number">4</span>
+                                            <span class="step-title">Inclusions & Exclusions</span>
+                                        </div>
+                                        <div class="step" data-step="5">
+                                            <span class="step-number">5</span>
+                                            <span class="step-title">Packing List</span>
+                                        </div>
+                                        <div class="step" data-step="6">
+                                            <span class="step-number">6</span>
+                                            <span class="step-title">FAQs</span>
+                                        </div>
+                                        <div class="step" data-step="7">
+                                            <span class="step-number">7</span>
+                                            <span class="step-title">Cost Information</span>
+                                        </div>
+                                        <div class="step" data-step="8">
+                                            <span class="step-number">8</span>
+                                            <span class="step-title">Images</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Step 1: Trek Package Basic Details -->
+                            <div class="form-step active" id="step-1">
+                                <div class="card mb-4">
+                                    <div class="card-header">
+                                        <h5 class="mb-0"><i class="fas fa-info-circle"></i> Basic Trek Information</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label required">Title</label>
+                                                <input type="text" class="form-control" name="Title" required>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label required">Slug</label>
+                                                <input type="text" class="form-control" name="Slug" required>
+                                                <input type="hidden" name="Slug" id="slugHidden">
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label required">Country</label>
+                                                <input type="text" class="form-control" name="Country" required>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label required">Duration</label>
+                                                <input type="text" class="form-control" name="Duration" placeholder="e.g., 14 Days" required>
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-md-4 mb-3">
+                                                <label class="form-label required">Difficulty</label>
+                                                <select class="form-select" name="Difficulty" required>
+                                                    <option value="">Select Difficulty</option>
+                                                    <option value="Easy">Easy</option>
+                                                    <option value="Moderate">Moderate</option>
+                                                    <option value="Challenging">Challenging</option>
+                                                    <option value="Strenuous">Strenuous</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-4 mb-3">
+                                                <label class="form-label required">Activity</label>
+                                                <input type="text" class="form-control" name="Activity" placeholder="e.g., Trekking" required>
+                                            </div>
+                                            <div class="col-md-4 mb-3">
+                                                <label class="form-label required">Max Altitude</label>
+                                                <input type="text" class="form-control" name="MaxAltitude" placeholder="e.g., 5,364m" required>
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label required">Best Season</label>
+                                                <input type="text" class="form-control" name="BestSeason" placeholder="e.g., March to May, September to November" required>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label required">Start/End Point</label>
+                                                <input type="text" class="form-control" name="StartEndPoint" placeholder="e.g., Lukla" required>
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label required">Accommodation</label>
+                                                <input type="text" class="form-control" name="Accomodation" placeholder="e.g., Tea Houses, Lodge" required>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label required">Meal</label>
+                                                <input type="text" class="form-control" name="Meal" placeholder="e.g., Breakfast, Lunch, Dinner" required>
+                                            </div>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label class="form-label required">Description</label>
+                                            <textarea class="form-control" id="trek-description-editor" name="Description" rows="4" placeholder="Enter detailed description of the trek package..."></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Step 2: Trek Overview & Highlights -->
+                            <div class="form-step" id="step-2" style="display: none;">
+                                <div class="card mb-4">
+                                    <div class="card-header">
+                                        <h5 class="mb-0"><i class="fas fa-file-alt"></i> Trek Overview & Highlights</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="mb-3">
+                                            <label class="form-label required">Overview Description</label>
+                                            <textarea class="form-control" id="trek-overview-editor" name="TrekOverview" rows="8" placeholder="Provide a comprehensive overview of the trek..."></textarea>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label required">Highlights</label>
+                                            <textarea class="form-control" id="trek-highlights-editor" name="TrekHighlight" rows="8" placeholder="List the key highlights of the trek..."></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Step 3: Trek Itinerary -->
+                            <div class="form-step" id="step-3" style="display: none;">
+                                <div class="card mb-4">
+                                    <div class="card-header">
+                                        <h5 class="mb-0"><i class="fas fa-route"></i> Trek Itinerary</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div id="itineraryContainer">
+                                            <div class="itinerary-item">
+                                                <div class="row">
+                                                    <div class="col-12 mb-3">
+                                                        <h6 class="text-primary">Day 1</h6>
+                                                    </div>
+                                                    <div class="col-md-6 mb-3">
+                                                        <label class="form-label required">Day Number</label>
+                                                        <input type="number" class="form-control" name="TrekItineraryDays[0].DayNumber" value="1" required>
+                                                    </div>
+                                                    <div class="col-md-6 mb-3">
+                                                        <label class="form-label required">Title</label>
+                                                        <input type="text" class="form-control" name="TrekItineraryDays[0].Title" placeholder="e.g., Arrival in Kathmandu" required>
+                                                    </div>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="form-label required">Description</label>
+                                                    <textarea class="form-control trek-editor" id="trek-itinerary-editor-0" name="TrekItineraryDays[0].Description" rows="3" placeholder="Detailed description of the day's activities and what to expect..."></textarea>
+                                                </div>
+                                                <div class="text-end">
+                                                    <button type="button" class="btn btn-outline-danger btn-sm remove-itinerary" style="display: none;">
+                                                        <i class="fas fa-trash"></i> Remove Day
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <button type="button" class="btn btn-outline-primary" id="addItinerary">
+                                            <i class="fas fa-plus"></i> Add Another Day
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Step 4: Package Inclusions & Exclusions -->
+                            <div class="form-step" id="step-4" style="display: none;">
+                                <div class="card mb-4">
+                                    <div class="card-header">
+                                        <h5 class="mb-0"><i class="fas fa-file-alt"></i> Trek Inclusions & Exclusions</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="mb-3">
+                                            <label class="form-label required">Inclusions</label>
+                                            <textarea class="form-control" id="trek-inclusions-editor" name="TrekingPackageInclusion" rows="8" placeholder="Provide comprehensive details of what is included in the trek package..."></textarea>
+                                            <small class="form-text text-muted">List all inclusions to give trekkers a clear understanding of what's covered.</small>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label required">Exclusions</label>
+                                            <textarea class="form-control" id="trek-exclusions-editor" name="TrekingPackageExclusion" rows="8" placeholder="Provide comprehensive details of what is not included in the trek package..."></textarea>
+                                            <small class="form-text text-muted">List all exclusions to set clear expectations for trekkers.</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Step 5: Packing List -->
+                            <div class="form-step" id="step-5" style="display: none;">
+                                <div class="card mb-4">
+                                    <div class="card-header">
+                                        <h5 class="mb-0"><i class="fas fa-file-alt"></i> Packing List</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="mb-3">
+                                            <label class="form-label required">Packing List</label>
+                                            <textarea class="form-control" id="trek-packing-editor" name="TrekPackingList" rows="8" placeholder="Provide a detailed packing list for the trek..."></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Step 6: FAQs -->
+                            <div class="form-step" id="step-6" style="display: none;">
+                                <div class="card mb-4">
+                                    <div class="card-header">
+                                        <h5 class="mb-0"><i class="fas fa-question-circle"></i> Frequently Asked Questions</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div id="faqsContainer">
+                                            <div class="faq-item">
+                                                <div class="row">
+                                                    <div class="col-12 mb-3">
+                                                        <h6 class="text-info">FAQ 1</h6>
+                                                    </div>
+                                                    <div class="col-md-6 mb-3">
+                                                        <label class="form-label">Category</label>
+                                                        <select class="form-select" name="FAQs[0].Category">
+                                                            <option value="">Select Category</option>
+                                                            <option value="General">General</option>
+                                                            <option value="Preparation">Preparation</option>
+                                                            <option value="During Trek">During Trek</option>
+                                                            <option value="Accommodation">Accommodation</option>
+                                                            <option value="Food">Food</option>
+                                                            <option value="Weather">Weather</option>
+                                                            <option value="Equipment">Equipment</option>
+                                                            <option value="Health & Safety">Health & Safety</option>
+                                                            <option value="Permits">Permits</option>
+                                                            <option value="Transportation">Transportation</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-md-6 mb-3">
+                                                        <label class="form-label required">Question</label>
+                                                        <input type="text" class="form-control" name="FAQs[0].Question" placeholder="Enter frequently asked question" required>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-12 mb-3">
+                                                        <label class="form-label required">Answer</label>
+                                                        <textarea class="form-control" id="trek-faq-editor-0" name="FAQs[0].Answer" rows="4" placeholder="Provide detailed answer to the question..." required></textarea>
+                                                    </div>
+                                                </div>
+                                                <div class="text-end">
+                                                    <button type="button" class="btn btn-outline-danger btn-sm remove-faq" style="display: none;">
+                                                        <i class="fas fa-trash"></i> Remove FAQ
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <button type="button" class="btn btn-outline-info" id="addFaq">
+                                            <i class="fas fa-plus"></i> Add Another FAQ
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Step 7: Cost Information -->
+                            <div class="form-step" id="step-7" style="display: none;">
+                                <div class="card mb-4">
+                                    <div class="card-header">
+                                        <h5 class="mb-0"><i class="fas fa-dollar-sign"></i> Cost Information</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row mb-4">
+                                            <div class="col-md-4 mb-3">
+                                                <label class="form-label required">Base Price</label>
+                                                <input type="number" step="0.01" class="form-control" name="PackageCostInfo.BasePrice" placeholder="Enter base price" required>
+                                            </div>
+                                            <div class="col-md-4 mb-3">
+                                                <label class="form-label required">Currency</label>
+                                                <select class="form-select" name="PackageCostInfo.Currency" required>
+                                                    <option value="">Select Currency</option>
+                                                    <option value="USD">USD - US Dollar</option>
+                                                    <option value="EUR">EUR - Euro</option>
+                                                    <option value="GBP">GBP - British Pound</option>
+                                                    <option value="NPR">NPR - Nepalese Rupee</option>
+                                                    <option value="INR">INR - Indian Rupee</option>
+                                                    <option value="AUD">AUD - Australian Dollar</option>
+                                                    <option value="CAD">CAD - Canadian Dollar</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-4 mb-3">
+                                                <label class="form-label">Price Note</label>
+                                                <input type="text" class="form-control" name="PackageCostInfo.PriceNote" placeholder="e.g., Per person sharing">
+                                            </div>
+                                        </div>
+
+                                        <hr>
+
+                                        <div class="mb-4">
+                                            <h6><i class="fas fa-users"></i> Group Pricing</h6>
+                                            <p class="text-muted small">Add different pricing based on group sizes</p>
+                                        </div>
+
+                                        <div id="groupPricingContainer">
+                                            <div class="group-pricing-item">
+                                                <div class="row">
+                                                    <div class="col-12 mb-3">
+                                                        <h6 class="text-primary">Group Pricing 1</h6>
+                                                    </div>
+                                                    <div class="col-md-6 mb-3">
+                                                        <label class="form-label required">Group Size</label>
+                                                        <input type="text" class="form-control" name="PackageCostInfo.GroupPricing[0].GroupSize" placeholder="e.g., 1 Pax, 2-3 Pax, 4-6 Pax" required>
+                                                    </div>
+                                                    <div class="col-md-6 mb-3">
+                                                        <label class="form-label required">Price Per Person</label>
+                                                        <input type="text" class="form-control" name="PackageCostInfo.GroupPricing[0].PricePerPerson" placeholder="e.g., $2,500, $2,200" required>
+                                                    </div>
+                                                </div>
+                                                <div class="text-end">
+                                                    <button type="button" class="btn btn-outline-danger btn-sm remove-group-pricing" style="display: none;">
+                                                        <i class="fas fa-trash"></i> Remove Group Pricing
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <button type="button" class="btn btn-outline-primary" id="addGroupPricing">
+                                            <i class="fas fa-plus"></i> Add Another Group Pricing
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Step 8: Image Upload -->
+                            <div class="form-step" id="step-8" style="display: none;">
+                                <div class="card mb-4">
+                                    <div class="card-header">
+                                        <h5 class="mb-0"><i class="fas fa-images"></i> Upload Trek Images</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <!-- Image Upload Zone -->
+                                        <div class="image-upload-zone" id="imageUploadZone">
+                                            <i class="fas fa-cloud-upload-alt fa-3x mb-3 text-primary"></i>
+                                            <h5>Drag & Drop Images Here</h5>
+                                            <p class="text-muted">Or click to select files</p>
+                                            <input type="file" id="imageInput" multiple accept="image/*" style="display: none;">
+                                        </div>
+
+                                        <!-- Image Previews -->
+                                        <div id="imagePreviews" class="mt-4"></div>
+
+                                        <!-- Add More Images Button -->
+                                        <div class="text-center mt-3">
+                                            <button type="button" class="btn btn-outline-primary" id="addMoreImages">
+                                                <i class="fas fa-plus"></i> Add More Images
+                                            </button>
+                                        </div>
+
+                                        <!-- Image Details -->
+                                        <div id="imageDetailsContainer" class="mt-4"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Navigation Buttons -->
+                            <div class="d-flex justify-content-between mt-4">
+                                <button type="button" class="btn btn-secondary" id="prevStep" style="display: none;">
+                                    <i class="fas fa-chevron-left"></i> Previous
+                                </button>
+                                <div></div>
+                                <div>
+                                    <button type="button" class="btn btn-primary btn-lg" id="nextStep">
+                                        Next <i class="fas fa-chevron-right"></i>
+                                    </button>
+                                    <button type="submit" class="btn btn-success btn-lg" id="submitBtn" style="display: none;">
+                                        <i class="fas fa-save"></i> Submit Trek Package
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        class TrekPackageManager {
+            constructor() {
+                this.currentStep = 1;
+                this.totalSteps = 8;
+                this.selectedImages = [];
+                this.itineraryIndex = 1;
+                this.faqIndex = 1;
+                this.groupPricingIndex = 1;
+
+                this.init();
+            }
+
+            init() {
+                this.setupEventListeners();
+                this.setupDragAndDrop();
+                this.setupSlugGeneration();
+                this.setupItinerary();
+                this.setupFAQs();
+                this.setupGroupPricing();
+                this.setupTinyMCE();
+            }
+
+            setupTinyMCE() {
+                tinymce.init({
+                    selector: '#trek-description-editor, #trek-overview-editor, #trek-highlights-editor, #trek-inclusions-editor, #trek-exclusions-editor, #trek-packing-editor, .trek-editor',
+                    height: 400,
+                    menubar: false,
+                    plugins: 'link image lists code',
+                    toolbar: 'undo redo | styles | bold italic | alignleft aligncenter alignright | bullist numlist | link image | code',
+                    style_formats: [
+                        { title: 'Heading 2', block: 'h2' },
+                        { title: 'Heading 3', block: 'h3' },
+                        { title: 'Heading 4', block: 'h4' },
+                        { title: 'Paragraph', block: 'p' }
+                    ],
+                    image_uploadtab: true,
+                    branding: false,
+                    setup: (editor) => {
+                        editor.on('change', () => {
+                            editor.save();
+                        });
+                    }
+                });
+            }
+
+            setupSlugGeneration() {
+                const titleInput = document.querySelector('input[name="Title"]');
+                const slugInput = document.querySelector('input[name="Slug"]');
+                const slugHidden = document.getElementById('slugHidden');
+
+                titleInput.addEventListener('input', (e) => {
+                    const title = e.target.value;
+                    const slug = this.generateSlug(title);
+                    slugInput.value = slug;
+                    slugHidden.value = slug;
+                });
+
+                slugInput.addEventListener('input', (e) => {
+                    slugHidden.value = e.target.value;
+                });
+            }
+
+            generateSlug(title) {
+                return title
+                    .toLowerCase()
+                    .replace(/[^\w\s-]/g, '')
+                    .replace(/\s+/g, '-')
+                    .replace(/-+/g, '-')
+                    .trim();
+            }
+
+            setupGroupPricing() {
+                document.getElementById('addGroupPricing').addEventListener('click', () => {
+                    const container = document.getElementById('groupPricingContainer');
+                    const newGroupPricing = document.createElement('div');
+                    newGroupPricing.className = 'group-pricing-item';
+                    newGroupPricing.innerHTML = this.getGroupPricingTemplate(this.groupPricingIndex);
+                    container.appendChild(newGroupPricing);
+                    this.groupPricingIndex++;
+                    this.updateRemoveButtons('.group-pricing-item', '.remove-group-pricing');
+                });
+
+                document.addEventListener('click', (e) => {
+                    if (e.target.classList.contains('remove-group-pricing') ||
+                        e.target.closest('.remove-group-pricing')) {
+                        const groupPricingItem = e.target.closest('.group-pricing-item');
+                        groupPricingItem.remove();
+                        this.updateGroupPricingIndexes();
+                        this.updateRemoveButtons('.group-pricing-item', '.remove-group-pricing');
+                    }
+                });
+            }
+
+            getGroupPricingTemplate(index) {
+                return `
+                            <div class="row">
+                                <div class="col-12 mb-3">
+                                    <h6 class="text-primary">Group Pricing ${index + 1}</h6>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label required">Group Size</label>
+                                    <input type="text" class="form-control" name="PackageCostInfo.GroupPricing[${index}].GroupSize" placeholder="e.g., 1 Pax, 2-3 Pax, 4-6 Pax" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label required">Price Per Person</label>
+                                    <input type="text" class="form-control" name="PackageCostInfo.GroupPricing[${index}].PricePerPerson" placeholder="e.g., $2,500, $2,200" required>
+                                </div>
+                            </div>
+                            <div class="text-end">
+                                <button type="button" class="btn btn-outline-danger btn-sm remove-group-pricing">
+                                    <i class="fas fa-trash"></i> Remove Group Pricing
+                                </button>
+                            </div>
+                        `;
+            }
+
+            updateGroupPricingIndexes() {
+                const groupPricings = document.querySelectorAll('.group-pricing-item');
+                groupPricings.forEach((item, index) => {
+                    const header = item.querySelector('h6');
+                    header.textContent = `Group Pricing ${index + 1}`;
+                    const inputs = item.querySelectorAll('input');
+                    inputs.forEach(input => {
+                        if (input.name && input.name.includes('GroupPricing[')) {
+                            const fieldName = input.name.split('.').pop();
+                            input.name = `PackageCostInfo.GroupPricing[${index}].${fieldName}`;
+                        }
+                    });
+                });
+                this.groupPricingIndex = groupPricings.length;
+            }
+
+            setupFAQs() {
+                document.getElementById('addFaq').addEventListener('click', () => {
+                    const container = document.getElementById('faqsContainer');
+                    const newFaq = document.createElement('div');
+                    newFaq.className = 'faq-item';
+                    newFaq.innerHTML = this.getFAQTemplate(this.faqIndex);
+                    container.appendChild(newFaq);
+                    tinymce.init({
+                        selector: `#trek-faq-editor-${this.faqIndex}`,
+                        height: 200,
+                        menubar: false,
+                        plugins: 'lists link',
+                        toolbar: 'bold italic underline | bullist numlist | link',
+                        setup: (editor) => {
+                            editor.on('change', () => {
+                                editor.save();
+                            });
+                        }
+                    });
+                    this.faqIndex++;
+                    this.updateRemoveButtons('.faq-item', '.remove-faq');
+                });
+
+                document.addEventListener('click', (e) => {
+                    if (e.target.classList.contains('remove-faq') ||
+                        e.target.closest('.remove-faq')) {
+                        const faqItem = e.target.closest('.faq-item');
+                        faqItem.remove();
+                        this.updateFAQIndexes();
+                        this.updateRemoveButtons('.faq-item', '.remove-faq');
+                    }
+                });
+            }
+
+            getFAQTemplate(index) {
+                return `
+                            <div class="row">
+                                <div class="col-12 mb-3">
+                                    <h6 class="text-info">FAQ ${index + 1}</h6>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Category</label>
+                                    <select class="form-select" name="FAQs[${index}].Category">
+                                        <option value="">Select Category</option>
+                                        <option value="General">General</option>
+                                        <option value="Preparation">Preparation</option>
+                                        <option value="During Trek">During Trek</option>
+                                        <option value="Accommodation">Accommodation</option>
+                                        <option value="Food">Food</option>
+                                        <option value="Weather">Weather</option>
+                                        <option value="Equipment">Equipment</option>
+                                        <option value="Health & Safety">Health & Safety</option>
+                                        <option value="Permits">Permits</option>
+                                        <option value="Transportation">Transportation</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label required">Question</label>
+                                    <input type="text" class="form-control" name="FAQs[${index}].Question" placeholder="Enter frequently asked question" required>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12 mb-3">
+                                    <label class="form-label required">Answer</label>
+                                    <textarea class="form-control" id="trek-faq-editor-${index}" name="FAQs[${index}].Answer" rows="4" placeholder="Provide detailed answer to the question..." required></textarea>
+                                </div>
+                            </div>
+                            <div class="text-end">
+                                <button type="button" class="btn btn-outline-danger btn-sm remove-faq">
+                                    <i class="fas fa-trash"></i> Remove FAQ
+                                </button>
+                            </div>
+                        `;
+            }
+
+            setupItinerary() {
+                document.getElementById('addItinerary').addEventListener('click', () => {
+                    const container = document.getElementById('itineraryContainer');
+                    const newItinerary = document.createElement('div');
+                    newItinerary.className = 'itinerary-item';
+                    newItinerary.innerHTML = this.getItineraryTemplate(this.itineraryIndex, this.itineraryIndex + 1);
+                    container.appendChild(newItinerary);
+                    tinymce.init({
+                        selector: `#trek-itinerary-editor-${this.itineraryIndex}`,
+                        height: 200,
+                        menubar: false,
+                        plugins: 'lists link',
+                        toolbar: 'bold italic underline | bullist numlist | link',
+                        setup: (editor) => {
+                            editor.on('change', () => {
+                                editor.save();
+                            });
+                        }
+                    });
+                    this.itineraryIndex++;
+                    this.updateRemoveButtons('.itinerary-item', '.remove-itinerary');
+                });
+
+                document.addEventListener('click', (e) => {
+                    if (e.target.classList.contains('remove-itinerary') ||
+                        e.target.closest('.remove-itinerary')) {
+                        const itineraryItem = e.target.closest('.itinerary-item');
+                        itineraryItem.remove();
+                        this.updateItineraryIndexes();
+                        this.updateRemoveButtons('.itinerary-item', '.remove-itinerary');
+                    }
+                });
+            }
+
+            getItineraryTemplate(index, dayNumber) {
+                return `
+                            <div class="row">
+                                <div class="col-12 mb-3">
+                                    <h6 class="text-primary">Day ${dayNumber}</h6>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label required">Day Number</label>
+                                    <input type="number" class="form-control" name="TrekItineraryDays[${index}].DayNumber" value="${dayNumber}" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label required">Title</label>
+                                    <input type="text" class="form-control" name="TrekItineraryDays[${index}].Title" placeholder="e.g., Trek to Base Camp" required>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label required">Description</label>
+                                <textarea class="form-control trek-editor" id="trek-itinerary-editor-${index}" name="TrekItineraryDays[${index}].Description" rows="3" placeholder="Detailed description of the day's activities and what to expect..."></textarea>
+                            </div>
+                            <div class="text-end">
+                                <button type="button" class="btn btn-outline-danger btn-sm remove-itinerary">
+                                    <i class="fas fa-trash"></i> Remove Day
+                                </button>
+                            </div>
+                        `;
+            }
+
+            updateRemoveButtons(containerSelector, removeButtonSelector) {
+                const items = document.querySelectorAll(containerSelector);
+                items.forEach((item, index) => {
+                    const removeBtn = item.querySelector(removeButtonSelector);
+                    if (items.length > 1) {
+                        removeBtn.style.display = 'block';
+                    } else {
+                        removeBtn.style.display = 'none';
+                    }
+                });
+            }
+
+            updateItineraryIndexes() {
+                const itineraries = document.querySelectorAll('.itinerary-item');
+                itineraries.forEach((item, index) => {
+                    const dayNumber = index + 1;
+                    const dayHeader = item.querySelector('h6');
+                    dayHeader.textContent = `Day ${dayNumber}`;
+                    const inputs = item.querySelectorAll('input, textarea');
+                    inputs.forEach(input => {
+                        if (input.name && input.name.includes('TrekItineraryDays[')) {
+                            const fieldName = input.name.split('.')[1];
+                            input.name = `TrekItineraryDays[${index}].${fieldName}`;
+                            if (fieldName === 'DayNumber') {
+                                input.value = dayNumber;
+                            }
+                        }
+                    });
+                    const textarea = item.querySelector('textarea');
+                    if (textarea) {
+                        textarea.id = `trek-itinerary-editor-${index}`;
+                    }
+                });
+                this.itineraryIndex = itineraries.length;
+            }
+
+            updateFAQIndexes() {
+                const faqs = document.querySelectorAll('.faq-item');
+                faqs.forEach((item, index) => {
+                    const header = item.querySelector('h6');
+                    header.textContent = `FAQ ${index + 1}`;
+                    const inputs = item.querySelectorAll('input, select, textarea');
+                    inputs.forEach(input => {
+                        if (input.name && input.name.includes('FAQs[')) {
+                            const fieldName = input.name.split('.')[1];
+                            input.name = `FAQs[${index}].${fieldName}`;
+                        }
+                    });
+                    const textarea = item.querySelector('textarea');
+                    if (textarea) {
+                        textarea.id = `trek-faq-editor-${index}`;
+                    }
+                });
+                this.faqIndex = faqs.length;
+            }
+
+            setupEventListeners() {
+                document.getElementById('imageUploadZone').addEventListener('click', () => {
+                    document.getElementById('imageInput').click();
+                });
+
+                document.getElementById('addMoreImages').addEventListener('click', () => {
+                    document.getElementById('imageInput').click();
+                });
+
+                document.getElementById('imageInput').addEventListener('change', (e) => {
+                    this.handleImageSelection(e.target.files);
+                });
+
+                document.getElementById('nextStep').addEventListener('click', () => {
+                    this.nextStep();
+                });
+
+                document.getElementById('prevStep').addEventListener('click', () => {
+                    this.prevStep();
+                });
+
+                document.getElementById('trekPackageForm').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.submitForm();
+                });
+            }
+
+            setupDragAndDrop() {
+                const uploadZone = document.getElementById('imageUploadZone');
+                uploadZone.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    uploadZone.classList.add('dragover');
+                });
+
+                uploadZone.addEventListener('dragleave', () => {
+                    uploadZone.classList.remove('dragover');
+                });
+
+                uploadZone.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    uploadZone.classList.remove('dragover');
+                    this.handleImageSelection(e.dataTransfer.files);
+                });
+            }
+
+            handleImageSelection(files) {
+                Array.from(files).forEach(file => {
+                    if (file.type.startsWith('image/')) {
+                        const imageData = {
+                            file: file,
+                            id: Date.now() + Math.random(),
+                            preview: URL.createObjectURL(file),
+                            caption: '',
+                            subCaption: '',
+                            isActive: true
+                        };
+                        this.selectedImages.push(imageData);
+                    }
+                });
+                this.displayImagePreviews();
+                this.updateImageDetails();
+            }
+
+            displayImagePreviews() {
+                const container = document.getElementById('imagePreviews');
+                container.innerHTML = '';
+                this.selectedImages.forEach((imageData, index) => {
+                    const previewDiv = document.createElement('div');
+                    previewDiv.className = 'image-preview';
+                    previewDiv.innerHTML = `
+                                <img src="${imageData.preview}" alt="Preview">
+                                <button type="button" class="remove-image" onclick="trekManager.removeImage(${index})">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                                <div class="mt-2">
+                                    <small class="text-muted">${imageData.file.name}</small>
+                                </div>
+                            `;
+                    container.appendChild(previewDiv);
+                });
+            }
+
+            updateImageDetails() {
+                const container = document.getElementById('imageDetailsContainer');
+                if (this.selectedImages.length === 0) {
+                    container.innerHTML = '';
+                    return;
+                }
+
+                container.innerHTML = '<hr><h6 class="mt-4 mb-3"><i class="fas fa-edit"></i> Image Details</h6>';
+                this.selectedImages.forEach((imageData, index) => {
+                    const detailDiv = document.createElement('div');
+                    detailDiv.className = 'row mb-4 p-3 border rounded';
+                    detailDiv.innerHTML = `
+                                <div class="col-md-3">
+                                    <img src="${imageData.preview}" class="img-fluid rounded" style="max-height: 150px; object-fit: cover; width: 100%;">
+                                    <div class="mt-2">
+                                        <small class="text-muted">${imageData.file.name}</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-9">
+                                    <h6>Image ${index + 1} Details</h6>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label required">Caption</label>
+                                            <input type="text" class="form-control image-detail-input" data-index="${index}" data-field="caption" value="${imageData.caption}" placeholder="Enter image caption" required>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">Sub Caption</label>
+                                            <input type="text" class="form-control image-detail-input" data-index="${index}" data-field="subCaption" value="${imageData.subCaption}" placeholder="Enter sub caption">
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+                    container.appendChild(detailDiv);
+                });
+
+                document.querySelectorAll('.image-detail-input').forEach(input => {
+                    input.addEventListener('input', (e) => {
+                        const index = parseInt(e.target.dataset.index);
+                        const field = e.target.dataset.field;
+                        this.selectedImages[index][field] = e.target.value;
+                    });
+                });
+            }
+
+            removeImage(index) {
+                URL.revokeObjectURL(this.selectedImages[index].preview);
+                this.selectedImages.splice(index, 1);
+                this.displayImagePreviews();
+                this.updateImageDetails();
+            }
+
+            validateStep(step) {
+                const stepElement = document.getElementById(`step-${step}`);
+                const requiredInputs = stepElement.querySelectorAll('input[required], select[required], textarea[required]');
+                let isValid = true;
+
+                requiredInputs.forEach(input => {
+                    input.classList.remove('is-invalid');
+                    if (!input.value.trim()) {
+                        input.classList.add('is-invalid');
+                        isValid = false;
+                    }
+                });
+
+                if (!isValid) {
+                    this.showAlert('Please fill in all required fields.', 'warning');
+                }
+
+                return isValid;
+            }
+
+            nextStep() {
+                if (this.validateStep(this.currentStep)) {
+                    if (this.currentStep < this.totalSteps) {
+                        this.showStep(this.currentStep + 1);
+                    }
+                }
+            }
+
+            prevStep() {
+                if (this.currentStep > 1) {
+                    this.showStep(this.currentStep - 1);
+                }
+            }
+
+            showStep(step) {
+                document.querySelectorAll('.form-step').forEach(el => el.style.display = 'none');
+                document.querySelectorAll('.step').forEach(el => {
+                    el.classList.remove('active');
+                    if (parseInt(el.dataset.step) < step) {
+                        el.classList.add('completed');
+                    } else {
+                        el.classList.remove('completed');
+                    }
+                });
+
+                document.getElementById(`step-${step}`).style.display = 'block';
+                document.querySelector(`.step[data-step="${step}"]`).classList.add('active');
+
+                this.currentStep = step;
+
+                document.getElementById('prevStep').style.display = step > 1 ? 'block' : 'none';
+                document.getElementById('nextStep').style.display = step < this.totalSteps ? 'block' : 'none';
+                document.getElementById('submitBtn').style.display = step === this.totalSteps ? 'block' : 'none';
+
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+
+            showAlert(message, type = 'danger') {
+                const alertDiv = document.createElement('div');
+                alertDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+                alertDiv.style.cssText = 'top: 20px; right: 20px; z-index: 9999; max-width: 400px;';
+                alertDiv.innerHTML = `
+                            <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'warning' ? 'exclamation-triangle' : 'exclamation-circle'}"></i>
+                            ${message}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        `;
+                document.body.appendChild(alertDiv);
+
+                setTimeout(() => {
+                    if (alertDiv.parentNode) {
+                        alertDiv.parentNode.removeChild(alertDiv);
+                    }
+                }, 5000);
+            }
+
+            showLoading(show = true) {
+                document.getElementById('loadingOverlay').style.display = show ? 'flex' : 'none';
+            }
+
+            async submitForm() {
+                if (!this.validateStep(this.currentStep)) {
+                    return;
+                }
+
+                try {
+                    this.showLoading(true);
+                    this.createImageFormFields();
+                    document.getElementById('trekPackageForm').submit();
+                } catch (error) {
+                    this.showLoading(false);
+                    this.showAlert('Error creating trek package. Please try again.', 'danger');
+                    console.error('Submission error:', error);
+                }
+            }
+
+            createImageFormFields() {
+                document.querySelectorAll('input[name^="Image["]').forEach(el => el.remove());
+                const form = document.getElementById('trekPackageForm');
+
+                this.selectedImages.forEach((imageData, index) => {
+                    const fileInput = document.createElement('input');
+                    fileInput.type = 'file';
+                    fileInput.name = `Image[${index}].ImageFiles`;
+                    fileInput.style.display = 'none';
+                    const dataTransfer = new DataTransfer();
+                    dataTransfer.items.add(imageData.file);
+                    fileInput.files = dataTransfer.files;
+
+                    const captionInput = document.createElement('input');
+                    captionInput.type = 'hidden';
+                    captionInput.name = `Image[${index}].Caption`;
+                    captionInput.value = imageData.caption || '';
+
+                    const subCaptionInput = document.createElement('input');
+                    subCaptionInput.type = 'hidden';
+                    subCaptionInput.name = `Image[${index}].SubCaption`;
+                    subCaptionInput.value = imageData.subCaption || '';
+
+                    const isActiveInput = document.createElement('input');
+                    isActiveInput.type = 'hidden';
+                    isActiveInput.name = `Image[${index}].IsActive`;
+                    isActiveInput.value = 'true';
+
+                    form.appendChild(fileInput);
+                    form.appendChild(captionInput);
+                    form.appendChild(subCaptionInput);
+                    form.appendChild(isActiveInput);
+                });
+            }
+        }
+
+        const trekManager = new TrekPackageManager();
+    </script>
+</body>
+</html>

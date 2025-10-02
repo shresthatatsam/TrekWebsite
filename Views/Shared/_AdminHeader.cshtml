@@ -1,0 +1,236 @@
+﻿@* @using Microsoft.AspNetCore.Identity
+@inject SignInManager<Users> signInManager
+@inject IHttpContextAccessor HttpContextAccessor
+
+@{
+    var currentPath = HttpContextAccessor.HttpContext?.Request.Path.Value?.ToLower() ?? "";
+}
+
+<style>
+    html, body {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .wrapper {
+        display: flex;
+        height: 100vh;
+    }
+
+    .sidebar {
+        width: 240px;
+        background-color: #1e1e2f;
+        color: #fff;
+        padding: 1.5rem 1rem;
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        overflow-y: auto;
+        transition: all 0.3s ease;
+        z-index: 1000;
+    }
+
+    .sidebar h5 {
+        color: #00d1b2;
+        margin-bottom: 1rem;
+    }
+
+    .sidebar a {
+        display: block;
+        color: #ccc;
+        padding: 0.5rem 1rem;
+        margin: 0.3rem 0;
+        text-decoration: none;
+        border-radius: 5px;
+        font-weight: 500;
+    }
+
+    .sidebar a:hover,
+    .sidebar a.active {
+        background-color: #00d1b2;
+        color: #fff;
+    }
+
+    .sidebar form {
+        margin-top: 1rem;
+    }
+
+    .sidebar .btn-link {
+        color: #ccc;
+        text-decoration: none;
+    }
+
+    .sidebar .btn-link:hover {
+        color: #fff;
+    }
+
+    .content {
+        margin-left: 240px;
+        padding: 2rem;
+        transition: margin-left 0.3s ease;
+        width: 100%;
+    }
+
+    /* Toggle Button (Mobile) */
+    .toggle-sidebar-btn {
+        display: none;
+        position: fixed;
+        top: 1rem;
+        left: 1rem;
+        background-color: #00d1b2;
+        border: none;
+        color: white;
+        padding: 0.5rem 1rem;
+        font-size: 1.2rem;
+        border-radius: 5px;
+        z-index: 1100;
+    }
+
+    .sidebar-link {
+        background: none;
+        border: none;
+        color: #ccc;
+        padding: 0.5rem 1rem;
+        margin: 0.3rem 0;
+        text-align: left;
+        width: 100%;
+        display: block;
+        text-decoration: none;
+        font-weight: 500;
+        cursor: pointer;
+        border-radius: 5px;
+    }
+
+        .sidebar-link:hover {
+            background-color: #00d1b2;
+            color: #fff;
+        }
+
+
+    media (max-width: 768px) {
+        .sidebar {
+            transform: translateX(-100%);
+        }
+
+        .sidebar.active {
+            transform: translateX(0);
+        }
+
+        .content {
+            margin-left: 0;
+        }
+
+        .toggle-sidebar-btn {
+            display: inline-block;
+        }
+    }
+</style>
+
+<!-- Sidebar Toggle Button -->
+<button class="toggle-sidebar-btn" onclick="toggleSidebar()">☰</button>
+
+<!-- Sidebar -->
+<div id="sidebar" class="sidebar">
+    <h5>Navigation</h5>
+
+    <div class="dropdown">
+        <a class="dropdown-toggle @(currentPath.StartsWith("/Carousal") ? "active" : "")" data-bs-toggle="collapse" href="#carousalMenu" role="button" aria-expanded="false" aria-controls="carousalMenu">
+            Carousel
+        </a>
+        <div class="collapse @(currentPath.StartsWith("/Carousal") ? "show" : "")" id="carousalMenu">
+            <ul class="list-unstyled ps-3">
+                <li><a class="@(currentPath == "/Carousal/Create" ? "active" : "")" asp-controller="Carousal" asp-action="Create">Create Carousel</a></li>
+                <li><a class="@(currentPath == "/Carousal/Index" ? "active" : "")" asp-controller="Carousal" asp-action="Index">List Carousel</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- About Us Dropdown -->
+    <div class="dropdown">
+        <a class="dropdown-toggle @(currentPath.StartsWith("/AboutUs") ? "active" : "")" data-bs-toggle="collapse" href="#aboutMenu" role="button" aria-expanded="false" aria-controls="aboutMenu">
+            About Us
+        </a>
+        <div class="collapse @(currentPath.StartsWith("/AboutUs") ? "show" : "")" id="aboutMenu">
+            <ul class="list-unstyled ps-3">
+                <li><a class="@(currentPath == "/AboutUs/Create" ? "active" : "")" asp-controller="AboutUs" asp-action="Create">Create About</a></li>
+                <li><a class="@(currentPath == "/AboutUs/Index" ? "active" : "")" asp-controller="AboutUs" asp-action="Index">List About</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="dropdown">
+        <a class="dropdown-toggle @(currentPath.StartsWith("/Deals") ? "active" : "")" data-bs-toggle="collapse" href="#dealMenu" role="button" aria-expanded="false" aria-controls="dealMenu">
+           Deals
+        </a>
+        <div class="collapse @(currentPath.StartsWith("/deals") ? "show" : "")" id="dealMenu">
+            <ul class="list-unstyled ps-3">
+                <li><a class="@(currentPath == "/deal/Create" ? "active" : "")" asp-controller="Deal" asp-action="Create">Create Deal</a></li>
+                <li><a class="@(currentPath == "/deal/Index" ? "active" : "")" asp-controller="Deal" asp-action="Index">List Deal</a></li>
+            </ul>
+        </div>
+    </div>
+
+
+    <div class="dropdown">
+        <a class="dropdown-toggle @(currentPath.StartsWith("/PageContent") ? "active" : "")" data-bs-toggle="collapse" href="#PageContentMenu" role="button" aria-expanded="false" aria-controls="PageContentMenu">
+            PageContent
+        </a>
+        <div class="collapse @(currentPath.StartsWith("/PageContent") ? "show" : "")" id="PageContentMenu">
+            <ul class="list-unstyled ps-3">
+                <li><a class="@(currentPath == "/PageContent/Create" ? "active" : "")" asp-controller="PageContent" asp-action="Create">Create PageContent</a></li>
+                <li><a class="@(currentPath == "/PageContent/Index" ? "active" : "")" asp-controller="PageContent" asp-action="Index">List PageContent</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="dropdown">
+        <a class="dropdown-toggle @(currentPath.StartsWith("/NabBarContent") ? "active" : "")" data-bs-toggle="collapse" href="#NabBarContentMenu" role="button" aria-expanded="false" aria-controls="NabBarContentMenu">
+            PageContent
+        </a>
+        <div class="collapse @(currentPath.StartsWith("/NabBarContent") ? "show" : "")" id="NabBarContentMenu">
+            <ul class="list-unstyled ps-3">
+                <li><a class="@(currentPath == "/NabBarContent/Create" ? "active" : "")" asp-controller="NabBarContent" asp-action="Create">Create Nav Content</a></li>
+                <li><a class="@(currentPath == "/NabBarContent/Index" ? "active" : "")" asp-controller="NabBarContent" asp-action="Index">List PageContent</a></li>
+            </ul>
+        </div>
+    </div>
+
+
+      <div class="dropdown">
+        <a class="dropdown-toggle @(currentPath.StartsWith("/TrekContent") ? "active" : "")" data-bs-toggle="collapse" href="#TrekContentMenu" role="button" aria-expanded="false" aria-controls="TrekContentMenu">
+            Trek Package Content
+        </a>
+        <div class="collapse @(currentPath.StartsWith("/TrekContent") ? "show" : "")" id="TrekContentMenu">
+            <ul class="list-unstyled ps-3">
+                <li><a class="@(currentPath == "/TrekContent/Create" ? "active" : "")" asp-controller="TrekContent" asp-action="Create">Treks Package Content</a></li>
+                <li><a class="@(currentPath == "/TrekContent/Index" ? "active" : "")" asp-controller="TrekContent" asp-action="Index">List PageContent</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <hr />
+
+    @if (signInManager.IsSignedIn(User))
+    {
+        <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
+            @Html.AntiForgeryToken()
+            <button type="submit" class="sidebar-link">Logout</button>
+        </form>
+    }
+    else
+    {
+        <a class="@(currentPath == "/account/login" ? "active" : "")" asp-controller="Account" asp-action="Login">Login</a>
+        <a class="@(currentPath == "/account/register" ? "active" : "")" asp-controller="Account" asp-action="Register">Register</a>
+    }
+</div>
+
+<!-- Toggle Script -->
+<script>
+    function toggleSidebar() {
+        document.getElementById("sidebar").classList.toggle("active");
+    }
+</script>
+ *@

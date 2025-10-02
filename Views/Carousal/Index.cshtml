@@ -1,0 +1,66 @@
+﻿@model List<UserRoles.Dtos.ResponseDtos.CarousalImageResponseDto>
+
+@{
+    ViewData["Title"] = "Carousel List";
+}
+
+<h2>Carousel Images</h2>
+
+<!-- Filter Dropdown -->
+<form method="get" class="mb-3">
+    <div class="input-group" style="max-width: 300px;">
+        <select name="filter" class="form-select" onchange="this.form.submit()">
+            @foreach (var item in (IEnumerable<CarousalEnum>)ViewBag.EnumOptions)
+            {
+                if (item == (CarousalEnum)ViewBag.CurrentFilter)
+                {
+                    <option value="@item" selected="selected">@item</option>
+                }
+                else
+                {
+                    <option value="@item">@item</option>
+                }
+            }
+
+        </select>
+        <button type="submit" class="btn btn-primary">Filter</button>
+    </div>
+</form>
+
+<!-- Success/Error Messages -->
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+<!-- Table of Carousals -->
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Image</th>
+            <th>Caption</th>
+            <th>Sub Caption</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td><img src="@item.ImageUrl" alt="carousel image" width="120" /></td>
+                <td>@item.Caption</td>
+                <td>@item.SubCaption</td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning">Edit</a>
+                    <form asp-action="Delete" asp-route-id="@item.Id" method="post" class="d-inline" onsubmit="return confirm('Are you sure?');">
+                        <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

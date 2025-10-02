@@ -1,0 +1,46 @@
+﻿@model UserRoles.Dtos.ResponseDtos.AboutUsResponseDto
+
+@{
+    ViewData["Title"] = "About Us";
+}
+
+<h2>Carousel Images</h2>
+
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+<!-- Table of Carousals -->
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Image</th>
+            <th>Story</th>
+            <th>Title</th>
+            <th>Mission</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+       
+            <tr>
+                <td><img src="@Model.ImageUrl" alt="carousel image" width="120" /></td>
+            <td>@Model.Story</td>
+            <td>@Model.Title</td>
+            <td>@Model.Mission</td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-sm btn-warning">Edit</a>
+                    <form asp-action="Delete" asp-route-id="@Model.Id" method="post" class="d-inline" onsubmit="return confirm('Are you sure?');">
+                        @* <button type="submit" class="btn btn-sm btn-danger">Delete</button> *@
+                    </form>
+                </td>
+            </tr>
+        
+    </tbody>
+</table>

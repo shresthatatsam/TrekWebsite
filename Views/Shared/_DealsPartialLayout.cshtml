@@ -1,0 +1,145 @@
+﻿@using UserRoles.Models.Trek
+@{
+    var promos = ViewBag.PromoDeals as List<TrekPackage>;
+}
+
+<style>
+
+    .scroll-x {
+        display: flex;
+        gap: 1rem;
+        overflow-x: auto;
+    }
+
+    .promo-card {
+        flex: 0 0 300px; /* Width of each card */
+        display: flex;
+        flex-direction: column;
+        min-height: 400px; /* Ensures uniform height */
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    .promo-image {
+        height: 200px;
+        object-fit: cover;
+        
+    }
+
+    .promo-overlay {
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+         background: rgba(0, 0, 0, 0.6); 
+        color: #fff;
+        padding: 10px;
+    }
+
+    .promo-card .p-3 {
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+
+
+    .scroll-x {
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+
+ .cap{
+        background-color: rgb(80, 65, 40);
+ }
+
+</style>
+
+
+
+<section class="cap text-white py-5">
+    <div class="container">
+        <h2 class="text-center mb-4">Summer Deals Promo</h2>
+        <div class="scroll-x pb-3">
+            @if (promos != null && promos.Any())
+            {
+                foreach (var promo in promos)
+                {
+                    <div class="promo-card bg-white text-dark shadow">
+                         <div class="position-relative">
+                            <img src="@promo.TrekPackageImages[0]?.Image" class="w-100 promo-image" alt="@promo.Slug" />
+                            <div class="promo-overlay">
+                                <h5 class="mb-0">@promo.Slug</h5>
+                                <small>Starts at @promo.PackageCostInfo?.BasePrice</small>
+                            </div>
+                        </div>
+                        <div class="p-3">
+                            @if (promo.TrekingPackageInclusion != null && promo.TrekingPackageInclusion.Any())
+                            {
+                                <ul class="mb-2">
+                                  
+                                        <li>@Html.Raw(promo.TrekingPackageInclusion)</li>
+                                    
+                                </ul>
+                            }
+                            <a asp-action="Details" asp-controller="TrekPackage" asp-route-slug="@promo.Slug"
+                               class="btn btn-sm btn-primary">
+                                Learn More
+                            </a>
+                            @* <button class="btn btn-sm btn-warning w-100">Book Now</button> *@
+                        </div> 
+                      @*    <div class="position-relative">
+                            <img src="@promo.ImageUrl" class="w-100 promo-image" alt="@promo.Caption" />
+                            <div class="promo-overlay">
+                                <h5 class="mb-0">@promo.Caption</h5>
+                                <small>Starts at @promo.Amount</small>
+                            </div>
+                        </div> 
+                       <div class="p-3">
+                            @if (promo.Features != null && promo.Features.Any())
+                            {
+                                <ul class="mb-2">
+                                    @foreach (var feature in promo.Features)
+                                    {
+                                        <li>@feature</li>
+                                    }
+                                </ul>
+                            }
+                            <button class="btn btn-sm btn-warning w-100">Book Now</button>
+                </div>*@
+                    </div> 
+                }
+            }
+            else
+            {
+                <p>No promos available.</p>
+            }
+        </div>
+    </div>
+</section>
+
+<section class="container py-5 text-center">
+    <h2 class="mb-4">We'll handle your trip for you</h2>
+    <div class="row g-4">
+        <div class="col-6 col-md-3">
+            <img src="flight.jpg" class="img-fluid rounded" alt="Flight Booking">
+            <h5 class="mt-2">Flight Booking</h5>
+            <p class="small">Share your service offerings here.</p>
+        </div>
+        <div class="col-6 col-md-3">
+            <img src="tours.jpg" class="img-fluid rounded" alt="Tours & Activities">
+            <h5 class="mt-2">Tours & Activities</h5>
+            <p class="small">Share your service offerings here.</p>
+        </div>
+        <div class="col-6 col-md-3">
+            <img src="transfer.jpg" class="img-fluid rounded" alt="Airport Transfers">
+            <h5 class="mt-2">Airport Transfers</h5>
+            <p class="small">Share your service offerings here.</p>
+        </div>
+        <div class="col-6 col-md-3">
+            <img src="hotel.jpg" class="img-fluid rounded" alt="Hotel Bookings">
+            <h5 class="mt-2">Hotel Bookings</h5>
+            <p class="small">Share your service offerings here.</p>
+        </div>
+    </div>
+</section>
