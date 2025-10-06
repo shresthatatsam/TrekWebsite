@@ -4,142 +4,171 @@
 }
 
 <style>
+    /* ---- Container & Layout ---- */
+    .cap {
+        background-color: rgb(80, 65, 40);
+    }
 
     .scroll-x {
         display: flex;
         gap: 1rem;
         overflow-x: auto;
+        scroll-behavior: smooth;
+        padding-bottom: 1rem;
     }
 
+        .scroll-x::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .scroll-x::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 4px;
+        }
+
+    /* ---- Promo Card ---- */
     .promo-card {
-        flex: 0 0 300px; /* Width of each card */
+        flex: 0 0 300px;
         display: flex;
         flex-direction: column;
-        min-height: 400px; /* Ensures uniform height */
-        border-radius: 8px;
+        border-radius: 10px;
         overflow: hidden;
+        background: #fff;
+        color: #000;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        height: 100%;
     }
 
+        .promo-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 6px 14px rgba(0,0,0,0.15);
+        }
+
+    /* ---- Image ---- */
     .promo-image {
         height: 200px;
+        width: 100%;
         object-fit: cover;
-        
+        display: block;
     }
 
+    /* ---- Overlay ---- */
     .promo-overlay {
         position: absolute;
         bottom: 0;
         width: 100%;
-         background: rgba(0, 0, 0, 0.6); 
+        background: rgba(0, 0, 0, 0.55);
         color: #fff;
         padding: 10px;
+        font-size: 0.9rem;
     }
 
+    /* ---- Card Body ---- */
     .promo-card .p-3 {
-        flex-grow: 1;
+        flex: 1;
         display: flex;
         flex-direction: column;
         justify-content: space-between;
     }
 
-
-
-    .scroll-x {
-        overflow-x: auto;
-        white-space: nowrap;
+    /* ---- Description Text ---- */
+    .promo-description {
+        display: -webkit-box;
+        -webkit-line-clamp: 4; /* limit to 4 lines */
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        line-height: 1.5em;
+        max-height: 6em; /* 4 lines × 1.5em */
+        color: #333;
+        font-size: 0.95rem;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        white-space: normal;
+        margin-bottom: 1rem;
+        position: relative;
     }
 
- .cap{
-        background-color: rgb(80, 65, 40);
- }
+        /* Add “...” manually for consistent ellipsis across browsers */
+        .promo-description::after {
+            content: '...';
+            position: absolute;
+            right: 0;
+            bottom: 0;
+            background: #fff;
+            padding-left: 0.3em;
+        }
 
+    /* ---- Button ---- */
+    .promo-card .btn {
+        width: 100%; /* Full width button */
+        text-align: center;
+        background-color: #007bff;
+        border: none;
+        transition: background-color 0.2s ease;
+        margin-top: auto; /* Stick to bottom */
+    }
+
+        .promo-card .btn:hover {
+            background-color: #0056b3;
+        }
+
+    /* ---- Responsive ---- */
+    media (max-width: 576px) {
+        .promo-card
+
+    {
+        flex: 0 0 85%;
+    }
+
+    .promo-image {
+        height: 180px;
+    }
+
+    }
 </style>
-
-
 
 <section class="cap text-white py-5">
     <div class="container">
         <h2 class="text-center mb-4">Summer Deals Promo</h2>
-        <div class="scroll-x pb-3">
+        <div class="scroll-x">
             @if (promos != null && promos.Any())
             {
                 foreach (var promo in promos)
                 {
-                    <div class="promo-card bg-white text-dark shadow">
-                         <div class="position-relative">
-                            <img src="@promo.TrekPackageImages[0]?.Image" class="w-100 promo-image" alt="@promo.Slug" />
+                    <div class="promo-card">
+                        <div class="position-relative">
+                            <img src="@Url.Content(promo.TrekPackageImages[0]?.Image)"
+                                 alt="@promo.Slug"
+                                 class="promo-image" />
+
+
+
+
                             <div class="promo-overlay">
                                 <h5 class="mb-0">@promo.Slug</h5>
                                 <small>Starts at @promo.PackageCostInfo?.BasePrice</small>
                             </div>
                         </div>
+
                         <div class="p-3">
-                            @if (promo.TrekingPackageInclusion != null && promo.TrekingPackageInclusion.Any())
+                            @if (!string.IsNullOrEmpty(promo.Description))
                             {
-                                <ul class="mb-2">
-                                  
-                                        <li>@Html.Raw(promo.TrekingPackageInclusion)</li>
-                                    
-                                </ul>
+                                <p class="promo-description">@Html.Raw(promo.Description)</p>
                             }
                             <a asp-action="Details" asp-controller="TrekPackage" asp-route-slug="@promo.Slug"
                                class="btn btn-sm btn-primary">
                                 Learn More
                             </a>
-                            @* <button class="btn btn-sm btn-warning w-100">Book Now</button> *@
-                        </div> 
-                      @*    <div class="position-relative">
-                            <img src="@promo.ImageUrl" class="w-100 promo-image" alt="@promo.Caption" />
-                            <div class="promo-overlay">
-                                <h5 class="mb-0">@promo.Caption</h5>
-                                <small>Starts at @promo.Amount</small>
-                            </div>
-                        </div> 
-                       <div class="p-3">
-                            @if (promo.Features != null && promo.Features.Any())
-                            {
-                                <ul class="mb-2">
-                                    @foreach (var feature in promo.Features)
-                                    {
-                                        <li>@feature</li>
-                                    }
-                                </ul>
-                            }
-                            <button class="btn btn-sm btn-warning w-100">Book Now</button>
-                </div>*@
-                    </div> 
+                        </div>
+                    </div>
                 }
             }
             else
             {
                 <p>No promos available.</p>
             }
-        </div>
-    </div>
-</section>
-
-<section class="container py-5 text-center">
-    <h2 class="mb-4">We'll handle your trip for you</h2>
-    <div class="row g-4">
-        <div class="col-6 col-md-3">
-            <img src="flight.jpg" class="img-fluid rounded" alt="Flight Booking">
-            <h5 class="mt-2">Flight Booking</h5>
-            <p class="small">Share your service offerings here.</p>
-        </div>
-        <div class="col-6 col-md-3">
-            <img src="tours.jpg" class="img-fluid rounded" alt="Tours & Activities">
-            <h5 class="mt-2">Tours & Activities</h5>
-            <p class="small">Share your service offerings here.</p>
-        </div>
-        <div class="col-6 col-md-3">
-            <img src="transfer.jpg" class="img-fluid rounded" alt="Airport Transfers">
-            <h5 class="mt-2">Airport Transfers</h5>
-            <p class="small">Share your service offerings here.</p>
-        </div>
-        <div class="col-6 col-md-3">
-            <img src="hotel.jpg" class="img-fluid rounded" alt="Hotel Bookings">
-            <h5 class="mt-2">Hotel Bookings</h5>
-            <p class="small">Share your service offerings here.</p>
         </div>
     </div>
 </section>

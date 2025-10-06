@@ -1,0 +1,176 @@
+﻿<!-- Footer Start -->
+<footer class="footer">
+    <div class="footer__brand">
+        <h2 class="footer__logo">Destination Nepal</h2>
+        <p class="footer__tagline">Trekking · Tours · Adventure</p>
+    </div>
+
+    <div class="footer__container">
+        <!-- Destination Links -->
+        <div class="footer__links">
+            <h3 class="footer__title">Destination</h3>
+            <ul class="footer__menu">
+                <li><a href="#">Nepal</a></li>
+                <li><a href="#">Tibet</a></li>
+                <li><a href="#">Bhutan</a></li>
+                <li><a href="#">India</a></li>
+            </ul>
+        </div>
+
+        <!-- Company Links -->
+        <div class="footer__links">
+            <h3 class="footer__title">Company</h3>
+            <ul class="footer__menu">
+                <li><a href="#">About Us</a></li>
+                <li><a href="#">Meet Our Team</a></li>
+                <li><a href="#">17 Reasons to Choose Ace</a></li>
+                <li><a href="#">Awards and Achievements</a></li>
+                <li><a href="#">Contact Us</a></li>
+                <li><a href="#">Mission Statement</a></li>
+            </ul>
+        </div>
+
+        <!-- Contact Info -->
+        <div class="footer__contact">
+            <h3 class="footer__title">Contact Us</h3>
+            <p>Email: info@destination.com</p>
+            <p>Phone: +977 1 1234567</p>
+            <p>Address: Kathmandu, Nepal</p>
+        </div>
+    </div>
+
+    <!-- Footer Bottom -->
+    <div class="footer__bottom">
+        <p>&copy; 2025 Destination Nepal. All rights reserved.</p>
+    </div>
+</footer>
+
+<style>
+    /* ---- Footer Styles ---- */
+    .footer {
+        background-color: #0f1a24;
+        color: #aaa;
+        font-family: "Poppins", sans-serif;
+        padding: 60px 20px 25px;
+    }
+
+    .footer__container {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        gap: 2.5rem;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    /* Column Base Style */
+    .footer__brand,
+    .footer__links,
+    .footer__contact {
+        flex: 1 1 250px;
+        min-width: 220px;
+    }
+
+    .footer__logo {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #fff;
+        margin-bottom: 8px;
+    }
+
+    .footer__tagline {
+        font-size: 14px;
+        color: #bbb;
+    }
+
+    .footer__title {
+        font-size: 16px;
+        font-weight: 600;
+        color: #fff;
+        margin-bottom: 12px;
+        position: relative;
+    }
+
+    .footer__title::after {
+        content: "";
+        display: block;
+        width: 40px;
+        height: 2px;
+        background: #fff;
+        margin-top: 6px;
+    }
+
+    .footer__menu {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .footer__menu li {
+        margin-bottom: 8px;
+    }
+
+    .footer__menu a {
+        color: #aaa;
+        text-decoration: none;
+        font-size: 14px;
+        transition: color 0.3s, padding-left 0.3s;
+    }
+
+    .footer__menu a:hover {
+        color: #fff;
+        padding-left: 5px;
+    }
+
+    .footer__contact p {
+        font-size: 14px;
+        margin: 6px 0;
+    }
+
+    .footer__bottom {
+        text-align: center;
+        margin-top: 40px;
+        font-size: 13px;
+        color: #777;
+        border-top: 1px solid #222;
+        padding-top: 15px;
+    }
+
+    /* ---- Responsive ---- */
+    media (max-width: 992px) {
+        .footer__container {
+            justify-content: center;
+            text-align: center;
+        }
+
+        .footer__brand,
+        .footer__links,
+        .footer__contact {
+            flex: 1 1 45%;
+        }
+
+        .footer__title::after {
+            margin: 6px auto 0;
+        }
+    }
+
+    media (max-width: 600px) {
+        .footer__container {
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem;
+            text-align: center;
+        }
+
+        .footer__brand,
+        .footer__links,
+        .footer__contact {
+            flex: 1 1 100%;
+            min-width: unset;
+        }
+
+        .footer__menu a:hover {
+            padding-left: 0;
+        }
+    }
+</style>

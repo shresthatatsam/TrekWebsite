@@ -44,6 +44,40 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"> *@
     <style>
 
+        .itinerary-day {
+            border-left: 4px solid #28a745;
+            padding-left: 1rem;
+            margin-bottom: 1rem;
+            position: relative;
+        }
+
+        .day-header {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .day-number {
+            background: #28a745;
+            color: white;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .day-title {
+            margin: 0;
+        }
+
+        .day-description {
+            margin-top: 0.5rem;
+        }
         .hero-slide {
             position: absolute;
             top: 0;
@@ -169,29 +203,6 @@
                 border-bottom-color: #28a745;
                 background: #f8f9fa;
             }
-
-        .itinerary-day {
-            border-left: 4px solid #28a745;
-            padding-left: 1.5rem;
-            margin-bottom: 2rem;
-            position: relative;
-        }
-
-        .day-number {
-            position: absolute;
-            left: -12px;
-            top: 0;
-            background: #28a745;
-            color: white;
-            border-radius: 50%;
-            width: 24px;
-            height: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            font-weight: bold;
-        }
 
         .faq-item {
             border: 1px solid #dee2e6;
@@ -350,60 +361,57 @@
     <section class="container">
         <div class="trek-info-card">
             <h5><i class="fas fa-mountain"></i> <span>@Model.Title</span></h5>
-            <p class="text-muted"> @Html.Raw(Model.Description)</p>
+            <p class="text-muted">@Html.Raw(Model.Description)</p>
 
             <div class="row mt-3">
-                <div class="col-md-3 trek-info-item">
+                <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-6 trek-info-item">
                     <small><i class="fas fa-flag"></i> Country</small>
                     <div>@Model.Country</div>
                 </div>
 
-                <div class="col-md-3 trek-info-item">
+                <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-6 trek-info-item">
                     <small><i class="fas fa-clock"></i> Duration</small>
                     <div>@Model.Duration</div>
                 </div>
-                <div class="col-md-3 trek-info-item">
+
+                <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-6 trek-info-item">
                     <small><i class="fas fa-signal"></i> Difficulty</small>
                     <div>@Model.Difficulty</div>
                 </div>
 
-                <div class="col-md-3 trek-info-item">
+                <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-6 trek-info-item">
                     <small><i class="fas fa-hiking"></i> Activity</small>
                     <div>@Model.Activity</div>
                 </div>
-            </div>
 
-            <div class="row mt-3">
-
-                <div class="col-md-3 trek-info-item">
+                <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-6 trek-info-item">
                     <small><i class="fas fa-mountain"></i> Max Altitude</small>
                     <div>@Model.MaxAltitude</div>
                 </div>
-                <div class="col-md-3 trek-info-item">
+
+                <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-6 trek-info-item">
                     <small><i class="fas fa-sun"></i> Best Season</small>
                     <div>@Model.BestSeason</div>
                 </div>
-                <div class="col-md-3 trek-info-item">
+
+                <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-6 trek-info-item">
                     <small><i class="fas fa-hotel"></i> Accommodation</small>
                     <div>@Model.Accomodation</div>
                 </div>
-                <div class="col-md-3 trek-info-item">
+
+                <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-6 trek-info-item">
                     <small><i class="fas fa-utensils"></i> Meal</small>
                     <div>@Model.Meal</div>
                 </div>
 
-
-            </div>
-
-            <div class="row mt-3">
-
-                <div class="col-md-3 trek-info-item">
+                <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-6 trek-info-item">
                     <small><i class="fas fa-map-marker-alt"></i> Start / End Point</small>
                     <div>@Model.StartEndPoint</div>
                 </div>
             </div>
         </div>
     </section>
+
 
     <section class="container">
         <h3>Trek Overview</h3>
@@ -469,10 +477,11 @@
                         @foreach (var day in Model.trekItineraryDays.OrderBy(d => d.DayNumber))
                         {
                             <div class="itinerary-day">
-                                <div class="day-number">@day.DayNumber</div>
-                                <h5>Day @day.DayNumber: @day.Title</h5>
-                                <p>@Html.Raw(@day.Description)</p>
-
+                                <div class="day-header" onclick="toggleItinerary(this)">
+                                    <span class="day-number">Day @day.DayNumber</span>
+                                    <h5 class="day-title">@day.Title</h5>
+                                </div>
+                                <div class="day-description" style="display:none;">@Html.Raw(day.Description)</div>
                             </div>
                         }
                     }
@@ -481,6 +490,9 @@
                         <p class="text-muted">Detailed itinerary will be provided upon booking.</p>
                     }
                 </div>
+
+             
+
 
                 <!-- Inclusions & Exclusions Tab -->
                 <div id="inclusions" class="tab-content" style="display: none;">
@@ -651,7 +663,17 @@
                 icon.classList.add('fa-chevron-down');
             }
         }
+        function toggleItinerary(header) {
+            // The paragraph is the next sibling after the header
+            const desc = header.nextElementSibling;
 
+            // Toggle display
+            if (desc.style.display === "none" || desc.style.display === "") {
+                desc.style.display = "block";
+            } else {
+                desc.style.display = "none";
+            }
+        }
         // Auto-scroll to sections when needed
         document.addEventListener('DOMContentLoaded', function () {
             // Check if there's a hash in URL for direct section access
