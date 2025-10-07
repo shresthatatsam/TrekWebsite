@@ -6,6 +6,7 @@ using Stripe.Checkout;
 using System.Threading.Tasks;
 using UserRoles.Dtos.RequestDtos;
 using UserRoles.Models;
+using UserRoles.Models.Traveller;
 using UserRoles.Models.Trek;
 using UserRoles.Services.Interface;
 using TrekFAQ = UserRoles.Models.Trek.TrekFAQ;
@@ -79,20 +80,20 @@ namespace UserRoles.Controllers
 
 
         [HttpPost]
-        public async Task<IActionResult> BookAndPay([FromBody] TripBookingDto booking)
+        public async Task<IActionResult> BookAndPay([FromBody] TripBookingRequest booking)
         {
             try
             {
 
-            if (booking == null || booking.Travelers == null || !booking.Travelers.Any())
+            if (booking == null || booking.Traveler == null)
                 return BadRequest("Invalid booking data");
 
-            // 1️⃣ Save booking data to DB
-            // Example: _context.Bookings.Add(new Booking { ... });
-            // await _context.SaveChangesAsync();
+                // 1️⃣ Save booking data to DB
+                // Example: _context.Bookings.Add(new Booking { ... });
+                // await _context.SaveChangesAsync();
 
-            // 2️⃣ Send confirmation email
-            var emails = string.Join(",", booking.Travelers.Select(t => t.Email));
+                // 2️⃣ Send confirmation email
+                var emails = string.Join(",", booking.Traveler.Email);
             // Example: using IEmailService.SendBookingConfirmationAsync(emails, booking);
 
             // 3️⃣ Create Stripe session
@@ -120,7 +121,7 @@ namespace UserRoles.Controllers
                 Mode = "payment", // ✅ required
                 SuccessUrl = domain + "/Payment/Success?session_id={CHECKOUT_SESSION_ID}", // ✅ required
                 CancelUrl = domain + "/Payment/Cancel", // ✅ required
-                CustomerEmail = booking.Travelers.First().Email
+                CustomerEmail = booking.Traveler.Email
             };
 
             var service = new SessionService();

@@ -52,28 +52,28 @@ namespace UserRoles.Dtos.RequestDtos
         public IFormFile? PassportScan { get; set; }
     }
 
-    public class TripBookingDto
-    {
-        public string StartDate { get; set; }
-        public string EndDate { get; set; }
-        public int PeopleCount { get; set; }
-        public int PricePerPerson { get; set; }
-        public int TotalPrice { get; set; }
-        public List<TravelerDto> Travelers { get; set; }
-    }
+    //public class TripBookingDto
+    //{
+    //    public string StartDate { get; set; }
+    //    public string EndDate { get; set; }
+    //    public int PeopleCount { get; set; }
+    //    public int PricePerPerson { get; set; }
+    //    public int TotalPrice { get; set; }
+    //    public List<TravelerDto> Travelers { get; set; }
+    //}
 
-    public class TravelerDto
-    {
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
-        public string Email { get; set; }
-        public string DobMonth { get; set; }
-        public string DobDay { get; set; }
-        public string DobYear { get; set; }
-        public string Gender { get; set; }
-        public string Phone { get; set; }
-        public string Nationality { get; set; }
-        public string PassportNumber { get; set; }
-    }
+    //public class TravelerDto
+    //{
+    //    public string FirstName { get; set; }
+    //    public string LastName { get; set; }
+    //    public string Email { get; set; }
+    //    public string DobMonth { get; set; }
+    //    public string DobDay { get; set; }
+    //    public string DobYear { get; set; }
+    //    public string Gender { get; set; }
+    //    public string Phone { get; set; }
+    //    public string Nationality { get; set; }
+    //    public string PassportNumber { get; set; }
+    //}
 
 }
