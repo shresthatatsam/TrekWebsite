@@ -5,6 +5,212 @@
 <head>
     <meta charset="UTF-8">
     <title>Trip Booking Form</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .continue-button {
+            background-color: #00bfa5;
+            color: #fff;
+        }
+
+            .continue-button:hover {
+                background-color: #009e88;
+            }
+
+        #end-date {
+            background-color: #e9ecef;
+        }
+    </style>
+</head>
+<body class="bg-light py-4">
+    <div class="container">
+
+        <div class="row g-4">
+            <!-- LEFT COLUMN -->
+            <div class="col-lg-7">
+                <!-- Select Departure -->
+                <div class="card mb-4 shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">Select Departure</h5>
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label for="start-date" class="form-label">Start Date</label>
+                                <input type="date" id="start-date" class="form-control" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="end-date" class="form-label">End Date (@ViewBag.TripDuration Days Trip)</label>
+                                <input type="text" id="end-date" class="form-control" readonly>
+                            </div>
+                        </div>
+
+                        <label for="people" class="form-label mt-2">Select Number of People</label>
+                        <select id="people" name="people" class="form-select mb-2">
+                            @for (int i = 1; i <= 25; i++)
+                            {
+                                <option value="@i">@i @(i == 1 ? "Person" : "People")</option>
+                            }
+                        </select>
+                        <p id="price-note" class="text-success fw-bold"></p>
+                    </div>
+                </div>
+
+                <!-- Traveler Information -->
+                <div class="card mb-4 shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">Your Booking</h5>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span id="summary-dates">Not selected</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span id="summary-people">0 Pax</span>
+                            <span id="summary-price">$0.00</span>
+                        </div>
+                        <hr>
+                        <div class="d-flex justify-content-between">
+                            <strong>Trip Total:</strong>
+                            <strong id="summary-total">$0.00</strong>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span>Due at Booking (30%):</span>
+                            <strong id="summary-deposit">$0.00</strong>
+                        </div>
+                    </div>
+                  
+                </div>
+            </div>
+
+            <!-- RIGHT COLUMN: Booking Summary -->
+            <div class="col-lg-5">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">Traveler Information</h5>
+                        <form id="traveler-form">
+                            <div class="mb-3">
+                                <label class="form-label">Name *</label>
+                                <input type="text" name="traveler[name]" class="form-control" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Address *</label>
+                                <input type="text" name="traveler[address]" class="form-control" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Mobile *</label>
+                                <input type="tel" name="traveler[mobile]" class="form-control" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Email *</label>
+                                <input type="email" name="traveler[email]" class="form-control" required>
+                            </div>
+                            <button type="submit" class="btn continue-button w-100">Continue</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://js.stripe.com/v3/"></script>
+    <script>
+        const startDateInput = document.getElementById("start-date");
+        const endDateInput = document.getElementById("end-date");
+        const peopleSelect = document.getElementById("people");
+        const summaryDates = document.getElementById("summary-dates");
+        const summaryPeople = document.getElementById("summary-people");
+        const summaryPrice = document.getElementById("summary-price");
+        const summaryTotal = document.getElementById("summary-total");
+        const summaryDeposit = document.getElementById("summary-deposit");
+        const travelerForm = document.getElementById("traveler-form");
+
+        const tripDuration = @ViewBag.TripDuration;
+        const priceMap = @Html.Raw(JsonSerializer.Serialize(ViewBag.PriceMap));
+        const stripePublicKey = '@ViewBag.StripePublishableKey';
+
+        const today = new Date().toISOString().split("T")[0];
+        startDateInput.setAttribute("min", today);
+
+        function calculateEndDate(start, days) {
+            const date = new Date(start);
+            date.setDate(date.getDate() + days);
+            return date.toISOString().split("T")[0];
+        }
+
+        function getPricePerPerson(count) {
+            const group = priceMap.find(g => count >= g.min && count <= g.max);
+            return group ? group.price : 0;
+        }
+
+        function updateSummary() {
+            const start = startDateInput.value;
+            const peopleCount = parseInt(peopleSelect.value);
+            if (start && peopleCount) {
+                const end = calculateEndDate(start, tripDuration);
+                endDateInput.value = end;
+                const pricePerPerson = getPricePerPerson(peopleCount);
+                const total = pricePerPerson * peopleCount;
+                const deposit = Math.round(total * 0.3);
+
+                summaryDates.textContent = `${start} → ${end}`;
+                summaryPeople.textContent = `${peopleCount} Pax`;
+                summaryPrice.textContent = `$${pricePerPerson.toLocaleString()}`;
+                summaryTotal.textContent = `$${total.toLocaleString()}`;
+                summaryDeposit.textContent = `$${deposit.toLocaleString()}`;
+                document.getElementById("price-note").textContent = `Price per person for ${peopleCount} pax: $${pricePerPerson.toLocaleString()}`;
+            }
+        }
+
+        startDateInput.addEventListener("change", updateSummary);
+        peopleSelect.addEventListener("change", updateSummary);
+
+        startDateInput.value = today;
+        updateSummary();
+
+        travelerForm.addEventListener("submit", async function (e) {
+            e.preventDefault();
+            const formData = new FormData(travelerForm);
+            const tripData = {
+                startDate: startDateInput.value,
+                endDate: endDateInput.value,
+                peopleCount: parseInt(peopleSelect.value),
+                pricePerPerson: parseInt(summaryPrice.textContent.replace('$', '').replace(',', '')),
+                totalPrice: parseInt(summaryTotal.textContent.replace('$', '').replace(',', '')),
+                traveler: {
+                    name: formData.get("traveler[name]"),
+                    address: formData.get("traveler[address]"),
+                    mobile: formData.get("traveler[mobile]"),
+                    email: formData.get("traveler[email]")
+                }
+            };
+
+            try {
+                const response = await fetch('/TrekPackage/BookAndPay', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(tripData)
+                });
+                const result = await response.json();
+                if (result.sessionId) {
+                    const stripe = Stripe(stripePublicKey);
+                    await stripe.redirectToCheckout({ sessionId: result.sessionId });
+                } else {
+                    alert("Error processing payment. Please try again.");
+                }
+            } catch (err) {
+                console.error(err);
+                alert("An unexpected error occurred.");
+            }
+        });
+    </script>
+</body>
+</html>
+
+
+@* @using System.Text.Json
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Trip Booking Form</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -319,3 +525,4 @@
 </html>
 
 
+ *@

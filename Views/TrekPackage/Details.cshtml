@@ -1,690 +1,735 @@
 ﻿@using UserRoles.Models.Trek
 @model TrekPackage
 @{
-    ViewData["Title"] = $"{Model.Title} | Trek Packages 2025/26";
+	ViewData["Title"] = $"{Model.Title} | Trek Packages 2025/26";
 }
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
 
-    @{
-        ViewData["Title"] = $"{Model.Title} | Trek Packages 2025/26";
-    }
-    <meta name="description" content="@Model.TrekOverview?.Substring(0, Math.Min(160, Model.TrekOverview.Length))">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+	@{
+		ViewData["Title"] = $"{Model.Title} | Trek Packages 2025/26";
+	}
+	<meta name="description" content="@Model.TrekOverview?.Substring(0, Math.Min(160, Model.TrekOverview.Length))">
+	<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+	<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 
-    <!-- Structured Data JSON-LD -->
-    <script type="application/ld+json">
-        {
-          "@@context": "https://schema.org",
-          "@@type": "TouristTrip",
-          "name": "@Model.Title",
-          "description": "@Model.TrekOverview",
-          "touristType": "Adventure",
-          "touristDestination": "@Model.Country",
-          "image": [
-        @string.Join(",", Model.TrekPackageImages.Select(img => "\"" + img.Image + "\""))
-          ],
-          "startDate": "@DateTime.Now.ToString("yyyy-MM-dd")",
-          "endDate": "@DateTime.Now.AddDays(10).ToString("yyyy-MM-dd")",
-          "offers": {
-            "@@type": "Offer",
-            "price": "@Model.PackageCostInfo?.BasePrice",
-            "priceCurrency": "@Model.PackageCostInfo?.Currency",
-            "availability": "https://schema.org/InStock",
-            "url": "@Url.Action("BookNow", "TrekPackage", new { slug = Model.Slug }, protocol: Context.Request.Scheme)"
-          }
-        }
-    </script>
-    @* <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"> *@
-    <style>
+	<!-- Structured Data JSON-LD -->
+	<script type="application/ld+json">
+		{
+		  "@@context": "https://schema.org",
+		  "@@type": "TouristTrip",
+		  "name": "@Model.Title",
+		  "description": "@Model.TrekOverview",
+		  "touristType": "Adventure",
+		  "touristDestination": "@Model.Country",
+		  "image": [
+		@string.Join(",", Model.TrekPackageImages.Select(img => "\"" + img.Image + "\""))
+		  ],
+		  "startDate": "@DateTime.Now.ToString("yyyy-MM-dd")",
+		  "endDate": "@DateTime.Now.AddDays(10).ToString("yyyy-MM-dd")",
+		  "offers": {
+			"@@type": "Offer",
+			"price": "@Model.PackageCostInfo?.BasePrice",
+			"priceCurrency": "@Model.PackageCostInfo?.Currency",
+			"availability": "https://schema.org/InStock",
+			"url": "@Url.Action("BookNow", "TrekPackage", new { slug = Model.Slug }, protocol: Context.Request.Scheme)"
+		  }
+		}
+	</script>
+	@* <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+	<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"> *@
+	<style>
 
-        .itinerary-day {
-            border-left: 4px solid #28a745;
-            padding-left: 1rem;
-            margin-bottom: 1rem;
-            position: relative;
-        }
+		.itinerary-day {
+			border-left: 4px solid #28a745;
+		}
+		
 
-        .day-header {
-            display: flex;
-            align-items: center;
-            cursor: pointer;
-        }
+	
 
-        .day-number {
-            background: #28a745;
-            color: white;
-            border-radius: 50%;
-            width: 24px;
-            height: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            font-weight: bold;
-            margin-right: 10px;
-        }
+		.hero-slide {
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			background-size: cover;
+			background-position: center;
+			opacity: 0;
+			transition: opacity 1s ease-in-out;
+		}
 
-        .day-title {
-            margin: 0;
-        }
+			.hero-slide.active {
+				opacity: 1;
+				z-index: 1;
+			}
 
-        .day-description {
-            margin-top: 0.5rem;
-        }
-        .hero-slide {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-size: cover;
-            background-position: center;
-            opacity: 0;
-            transition: opacity 1s ease-in-out;
-        }
-
-            .hero-slide.active {
-                opacity: 1;
-                z-index: 1;
-            }
-
-        .trek-hero-slideshow {
-            position: relative;
-            height: 60vh; /* or desired height */
-            overflow: hidden;
-        }
+		.trek-hero-slideshow {
+			position: relative;
+			height: 60vh; /* or desired height */
+			overflow: hidden;
+		}
 
 
-        .hero-slide.active {
-            opacity: 1;
-        }
+		.hero-slide.active {
+			opacity: 1;
+		}
 
-        .trek-hero {
-            position: relative;
-            min-height: 60vh;
-            display: flex;
-            align-items: center;
-            color: white;
-            overflow: hidden;
-        }
+		.trek-hero {
+			position: relative;
+			min-height: 60vh;
+			display: flex;
+			align-items: center;
+			color: white;
+			overflow: hidden;
+		}
 
-        .trek-hero-bg {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            z-index: -2;
-        }
+		.trek-hero-bg {
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			object-fit: cover;
+			z-index: -2;
+		}
 
-        .trek-hero-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, rgba(0,0,0,0.7), rgba(0,0,0,0.4));
-            z-index: -1;
-        }
+		.trek-hero-overlay {
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			background: linear-gradient(135deg, rgba(0,0,0,0.7), rgba(0,0,0,0.4));
+			z-index: -1;
+		}
 
 
-        .trek-info-card {
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
-            padding: 2rem;
-            margin: -80px auto 3rem;
-            position: relative;
-            z-index: 10;
-            max-width: 1000px;
-        }
+		.trek-info-card {
+			background: white;
+			border-radius: 12px;
+			box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+			padding: 2rem;
+			margin: -80px auto 3rem;
+			position: relative;
+			z-index: 10;
+			max-width: 1000px;
+		}
 
-        .trek-info-item {
-            text-align: center;
-            padding: 1rem;
-        }
+		.trek-info-item {
+			text-align: center;
+			padding: 1rem;
+		}
 
-            .trek-info-item small {
-                display: block;
-                color: #6c757d;
-                font-weight: 500;
-                margin-bottom: 0.5rem;
-            }
+			.trek-info-item small {
+				display: block;
+				color: #6c757d;
+				font-weight: 500;
+				margin-bottom: 0.5rem;
+			}
 
-            .trek-info-item div {
-                font-size: 1.1rem;
-                font-weight: 600;
-                color: #333;
-            }
+			.trek-info-item div {
+				font-size: 1.1rem;
+				font-weight: 600;
+				color: #333;
+			}
 
-            .trek-info-item i {
-                color: #28a745;
-                margin-right: 0.5rem;
-            }
+			.trek-info-item i {
+				color: #28a745;
+				margin-right: 0.5rem;
+			}
 
-        .trek-card {
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-            overflow: hidden;
-            margin-bottom: 2rem;
-        }
+		.trek-card {
+			background: white;
+			border-radius: 12px;
+			box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+			overflow: hidden;
+			margin-bottom: 2rem;
+		}
 
-        .tab-nav {
-            display: flex;
-            border-bottom: 1px solid #dee2e6;
-            margin-bottom: 2rem;
-            background: white;
-            border-radius: 8px 8px 0 0;
-            overflow-x: auto;
-        }
+		.tab-nav {
+			display: flex;
+			border-bottom: 1px solid #dee2e6;
+			background: white;
+			border-radius: 8px 8px 0 0;
+			overflow-x: auto;
+		}
 
-        .tab-button {
-            padding: 1rem 2rem;
-            border: none;
-            background: none;
-            cursor: pointer;
-            font-weight: 500;
-            border-bottom: 3px solid transparent;
-            transition: all 0.3s;
-            white-space: nowrap;
-        }
+		.tab-button {
+			padding: 1rem 2rem;
+			border: none;
+			background: none;
+			cursor: pointer;
+			font-weight: 500;
+			border-bottom: 3px solid transparent;
+			transition: all 0.3s;
+			white-space: nowrap;
+		}
 
-            .tab-button.active {
-                color: #28a745;
-                border-bottom-color: #28a745;
-                background: #f8f9fa;
-            }
+			.tab-button.active {
+				color: #28a745;
+				border-bottom-color: #28a745;
+				background: #f8f9fa;
+			}
 
-        .faq-item {
-            border: 1px solid #dee2e6;
-            border-radius: 8px;
-            margin-bottom: 1rem;
-            overflow: hidden;
-        }
+		/* .faq-item {
+			border: 1px solid #dee2e6;
+			border-radius: 8px;
+			margin-bottom: 1rem;
+			overflow: hidden;
+		}
 
-        .faq-question {
-            padding: 1rem;
-            background: #f8f9fa;
-            cursor: pointer;
-            margin: 0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+		.faq-question {
+			padding: 1rem;
+			background: #f8f9fa;
+			cursor: pointer;
+			margin: 0;
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+		}
 
-        .faq-answer {
-            padding: 1rem;
-            background: white;
-        }
+		.faq-answer {
+			padding: 1rem;
+			background: white;
+		} */
 
-        .inclusion-exclusion {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 2rem;
-            margin: 2rem 0;
-        }
+		.inclusion-exclusion {
+			display: grid;
+			grid-template-columns: 1fr;
+			gap: 2rem;
+			
+		}
 
-        .packing-category {
-            margin-bottom: 2rem;
-            background: #f8f9fa;
-            border-radius: 8px;
-            padding: 1.5rem;
-        }
+		.packing-category {
+			margin-bottom: 2rem;
+			background: #f8f9fa;
+			border-radius: 8px;
+			padding: 1.5rem;
+		}
 
-        .image-gallery {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 1rem;
-            margin: 2rem 0;
-        }
+		.image-gallery {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+			gap: 1rem;
+			margin: 2rem 0;
+		}
 
-        .gallery-image {
-            border-radius: 8px;
-            overflow: hidden;
-            position: relative;
-        }
+		.gallery-image {
+			border-radius: 8px;
+			overflow: hidden;
+			position: relative;
+		}
 
-            .gallery-image img {
-                width: 100%;
-                height: 250px;
-                object-fit: cover;
-            }
+			.gallery-image img {
+				width: 100%;
+				height: 250px;
+				object-fit: cover;
+			}
 
-        .image-caption {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: linear-gradient(transparent, rgba(0,0,0,0.8));
-            color: white;
-            padding: 1rem;
-            font-size: 14px;
-        }
+		.image-caption {
+			position: absolute;
+			bottom: 0;
+			left: 0;
+			right: 0;
+			background: linear-gradient(transparent, rgba(0,0,0,0.8));
+			color: white;
+			padding: 1rem;
+			font-size: 14px;
+		}
 
-        .highlight-item {
-            display: flex;
-            align-items: center;
-            margin-bottom: 1rem;
-            padding: 0.5rem;
-            background: #e8f5e8;
-            border-radius: 6px;
-        }
+		.highlight-item {
+			display: flex;
+			align-items: center;
+			margin-bottom: 1rem;
+			padding: 0.5rem;
+			background: #e8f5e8;
+			border-radius: 6px;
+		}
 
-        .btn-primary {
-            background: #28a745;
-            border: none;
-            padding: 0.75rem 2rem;
-            border-radius: 6px;
-            color: white;
-            font-weight: 500;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
+		.btn-primary {
+			background: #28a745;
+			border: none;
+			padding: 0.75rem 2rem;
+			border-radius: 6px;
+			color: white;
+			font-weight: 500;
+			cursor: pointer;
+			transition: background 0.3s;
+		}
 
-            .btn-primary:hover {
-                background: #218838;
-            }
+			.btn-primary:hover {
+				background: #218838;
+			}
 
-        media (max-width: 768px) {
-            .inclusion-exclusion
+		media (max-width: 768px) {
+			.inclusion-exclusion
 
-        {
-            grid-template-columns: 1fr;
-        }
+		{
+			grid-template-columns: 1fr;
+		}
 
-        .trek-info-card {
-            margin: -40px 1rem 2rem;
-            padding: 1.5rem;
-        }
+		.trek-info-card {
+			margin: -40px 1rem 2rem;
+			padding: 1.5rem;
+		}
 
-            .trek-info-card .row > div {
-                margin-bottom: 1rem;
-            }
+			.trek-info-card .row > div {
+				margin-bottom: 1rem;
+			}
 
-        .tab-nav {
-            flex-wrap: wrap;
-        }
+		.tab-nav {
+			flex-wrap: wrap;
+		}
 
-        }
+		}
 
-        .trek-info-item {
-            text-align: left;
-        }
+		.trek-info-item {
+			text-align: left;
+		}
 
-    </style>
+	</style>
 </head>
 <body>
-    <section class="trek-hero-slideshow position-relative">
-        @if (Model.TrekPackageImages?.Any() == true)
-        {
-            var heroImages = Model.TrekPackageImages.ToList();
+	<section class="trek-hero-slideshow position-relative">
+		@if (Model.TrekPackageImages?.Any() == true)
+		{
+			var heroImages = Model.TrekPackageImages.ToList();
 
-            @for (int i = 0; i < heroImages.Count; i++)
-            {
-                <div class="hero-slide @(i == 0 ? "active" : "")"
-                     style="background-image: url('@heroImages[i].Image');"
-                     data-img="@heroImages[i].Image">
-                </div>
-            }
-        }
+			@for (int i = 0; i < heroImages.Count; i++)
+			{
+				<div class="hero-slide @(i == 0 ? "active" : "")"
+					 style="background-image: url('@heroImages[i].Image');"
+					 data-img="@heroImages[i].Image">
+				</div>
+			}
+		}
 
-        <div class="hero-overlay">
-            <div class="container">
-                <!-- Your hero content here -->
-            </div>
-        </div>
-    </section>
+		<div class="hero-overlay">
+			<div class="container">
+				<!-- Your hero content here -->
+			</div>
+		</div>
+	</section>
 
-    <!-- Bootstrap Modal -->
-    <div class="modal fade" id="imageModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-xl">
-            <div class="modal-content bg-transparent border-0">
-                <img id="modalImage" src="" class="img-fluid rounded shadow" />
-            </div>
-        </div>
-    </div>
-
-
+	<!-- Bootstrap Modal -->
+	<div class="modal fade" id="imageModal" tabindex="-1" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered modal-xl">
+			<div class="modal-content bg-transparent border-0">
+				<img id="modalImage" src="" class="img-fluid rounded shadow" />
+			</div>
+		</div>
+	</div>
 
 
 
-    <!-- Trek Info Card -->
-    <section class="container">
-        <div class="trek-info-card">
-            <h5><i class="fas fa-mountain"></i> <span>@Model.Title</span></h5>
-            <p class="text-muted">@Html.Raw(Model.Description)</p>
-
-            <div class="row mt-3">
-                <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-6 trek-info-item">
-                    <small><i class="fas fa-flag"></i> Country</small>
-                    <div>@Model.Country</div>
-                </div>
-
-                <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-6 trek-info-item">
-                    <small><i class="fas fa-clock"></i> Duration</small>
-                    <div>@Model.Duration</div>
-                </div>
-
-                <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-6 trek-info-item">
-                    <small><i class="fas fa-signal"></i> Difficulty</small>
-                    <div>@Model.Difficulty</div>
-                </div>
-
-                <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-6 trek-info-item">
-                    <small><i class="fas fa-hiking"></i> Activity</small>
-                    <div>@Model.Activity</div>
-                </div>
-
-                <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-6 trek-info-item">
-                    <small><i class="fas fa-mountain"></i> Max Altitude</small>
-                    <div>@Model.MaxAltitude</div>
-                </div>
-
-                <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-6 trek-info-item">
-                    <small><i class="fas fa-sun"></i> Best Season</small>
-                    <div>@Model.BestSeason</div>
-                </div>
-
-                <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-6 trek-info-item">
-                    <small><i class="fas fa-hotel"></i> Accommodation</small>
-                    <div>@Model.Accomodation</div>
-                </div>
-
-                <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-6 trek-info-item">
-                    <small><i class="fas fa-utensils"></i> Meal</small>
-                    <div>@Model.Meal</div>
-                </div>
-
-                <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-6 trek-info-item">
-                    <small><i class="fas fa-map-marker-alt"></i> Start / End Point</small>
-                    <div>@Model.StartEndPoint</div>
-                </div>
-            </div>
-        </div>
-    </section>
 
 
-    <section class="container">
-        <h3>Trek Overview</h3>
-        <div class="col-lg-12 p-3">
+	<!-- Trek Info Card -->
+	<section class="container">
+		<div class="trek-info-card">
+			<h5><i class="fas fa-mountain"></i> <span>@Model.Title</span></h5>
+			<p class="text-muted">@Html.Raw(Model.Description)</p>
 
-            <p class="mb-4"> @Html.Raw(Model.TrekOverview)</p>
-        </div>
-    </section>
+			<div class="row mt-3">
+				<div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-6 trek-info-item">
+					<small><i class="fas fa-flag"></i> Country</small>
+					<div>@Model.Country</div>
+				</div>
 
-    <!-- Main Content with Tabs -->
-    <section class="container">
-        <div class="trek-card">
-            <div class="tab-nav">
-                <button class="tab-button active" onclick="showTab('overview')">Highlight</button>
-                <button class="tab-button" onclick="showTab('itinerary')">Itinerary</button>
-                <button class="tab-button" onclick="showTab('inclusions')">Inclusions & Exclusions</button>
-                <button class="tab-button" onclick="showTab('packing')">Packing List</button>
-                <button class="tab-button" onclick="showTab('faq')">FAQ</button>
-            </div>
+				<div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-6 trek-info-item">
+					<small><i class="fas fa-clock"></i> Duration</small>
+					<div>@Model.Duration</div>
+				</div>
 
-            <div class="p-4">
-                <!-- Overview Tab -->
-                <div id="overview" class="tab-content">
-                    <div class="row">
-                        <div class="col-lg-7">
-                            <p class=""> @Html.Raw(Model.TrekHighlight)</p>
-                        </div>
-                        @if (Model.PackageCostInfo != null)
-                        {
-                            <div class="col-lg-5">
-                                <div class="card">
-                                    <div class="card-header bg-success text-white">
-                                        <h5 class="mb-0">Quick Booking</h5>
-                                    </div>
+				<div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-6 trek-info-item">
+					<small><i class="fas fa-signal"></i> Difficulty</small>
+					<div>@Model.Difficulty</div>
+				</div>
 
+				<div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-6 trek-info-item">
+					<small><i class="fas fa-hiking"></i> Activity</small>
+					<div>@Model.Activity</div>
+				</div>
 
-                                    <div class="card-body">
-                                        <p><strong>Starting from:</strong> @Model.PackageCostInfo.Currency @Model.PackageCostInfo.BasePrice /Person</p>
-                                        <p><strong>Next Available:</strong> March 2025</p>
-                                        <button class="btn btn-primary w-100 mb-2">
-                                            <a asp-controller="TrekPackage"
-                                               asp-action="BookNow"
-                                               asp-route-slug="@Model.Slug.ToString()"
-                                               class="text-white text-decoration-none d-block w-100 h-100">
-                                                Book Now
-                                            </a>
-                                        </button>
+				<div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-6 trek-info-item">
+					<small><i class="fas fa-mountain"></i> Max Altitude</small>
+					<div>@Model.MaxAltitude</div>
+				</div>
 
-                                        <button class="btn btn-primary w-100 mb-2">Check Availability</button>
-                                        <button class="btn btn-outline-primary w-100">Request Custom Quote</button>
-                                    </div>
-                                </div>
-                            </div>
-                        }
-                    </div>
-                </div>
+				<div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-6 trek-info-item">
+					<small><i class="fas fa-sun"></i> Best Season</small>
+					<div>@Model.BestSeason</div>
+				</div>
 
-                <!-- Itinerary Tab -->
-                <div id="itinerary" class="tab-content" style="display: none;">
+				<div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-6 trek-info-item">
+					<small><i class="fas fa-hotel"></i> Accommodation</small>
+					<div>@Model.Accomodation</div>
+				</div>
 
-                    @if (Model.trekItineraryDays?.Any() == true)
-                    {
-                        @foreach (var day in Model.trekItineraryDays.OrderBy(d => d.DayNumber))
-                        {
-                            <div class="itinerary-day">
-                                <div class="day-header" onclick="toggleItinerary(this)">
-                                    <span class="day-number">@day.DayNumber</span>
-                                    <h5 class="day-title">@day.Title</h5>
-                                </div>
-                                <div class="day-description" style="display:none;">@Html.Raw(day.Description)</div>
-                            </div>
-                        }
-                    }
-                    else
-                    {
-                        <p class="text-muted">Detailed itinerary will be provided upon booking.</p>
-                    }
-                </div>
+				<div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-6 trek-info-item">
+					<small><i class="fas fa-utensils"></i> Meal</small>
+					<div>@Model.Meal</div>
+				</div>
 
-             
+				<div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-6 trek-info-item">
+					<small><i class="fas fa-map-marker-alt"></i> Start / End Point</small>
+					<div>@Model.StartEndPoint</div>
+				</div>
+			</div>
+		</div>
+	</section>
 
 
-                <!-- Inclusions & Exclusions Tab -->
-                <div id="inclusions" class="tab-content" style="display: none;">
-                    <div class="inclusion-exclusion">
-                        <div>
-                            <h4 class="text-success">
-                                <i class="fas fa-check-circle me-2"></i>What's Included
-                            </h4>
-                            <p class="mb-4"> @Html.Raw(Model.TrekingPackageInclusion)</p>
+	<section class="container">
+		<h3>Trek Overview</h3>
+		<div class="col-lg-12 p-3">
 
-                        </div>
+			<p class="mb-4"> @Html.Raw(Model.TrekOverview)</p>
+		</div>
+	</section>
 
-                        <div>
-                            <h4 class="text-danger">
-                                <i class="fas fa-times-circle me-2"></i>What's Not Included
-                            </h4>
+	<!-- Main Content with Tabs -->
+	<section class="container">
+		<div class="trek-card">
+			<div class="tab-nav">
+				<button class="tab-button active" onclick="showTab('overview')">Highlight</button>
+				<button class="tab-button" onclick="showTab('itinerary')">Itinerary</button>
+				<button class="tab-button" onclick="showTab('inclusions')">Inclusions</button>
+				<button class="tab-button" onclick="showTab('exclusions')">Exclusions</button>
+				<button class="tab-button" onclick="showTab('packing')">Packing List</button>
+				<button class="tab-button" onclick="showTab('faq')">FAQ</button>
+			</div>
 
-                            <p class="mb-4"> @Html.Raw(Model.TrekingPackageExclusion)</p>
+			<div class="p-2">
+				<!-- Overview Tab -->
+				<div id="overview" class="tab-content">
+					<div class="container py-3">
+						<div class="row g-4">
+							<!-- Overview / Highlights Section -->
+							<div class="col-lg-7">
+								<div class="card border-success mb-3">
+									<div class="card-header bg-success text-white">
+										<h5 class="mb-0">
+											<i class="fas fa-mountain me-2"></i>Trip Highlights
+										</h5>
+									</div>
+									<div class="card-body">
+										<p class="mb-0">@Html.Raw(Model.TrekHighlight)</p>
+									</div>
+								</div>
+							</div>
+
+							<!-- Quick Booking Section -->
+							@if (Model.PackageCostInfo != null)
+							{
+								<div class="col-lg-5">
+									<div class="card border-primary mb-3 shadow-sm">
+										<div class="card-header bg-primary text-white">
+											<h5 class="mb-0">
+												<i class="fas fa-calendar-check me-2"></i>Quick Booking
+											</h5>
+										</div>
+										<div class="card-body">
+											<p>
+												<strong>Starting from:</strong>
+												<span class="text-success">
+													@Model.PackageCostInfo.Currency @Model.PackageCostInfo.BasePrice
+												</span> / Person
+											</p>
+											<p><strong>Next Available:</strong> <span class="text-muted">March 2025</span></p>
+
+											<div class="d-grid gap-2">
+												<a asp-controller="TrekPackage"
+												   asp-action="BookNow"
+												   asp-route-slug="@Model.Slug.ToString()"
+												   class="btn btn-success text-white">
+													<i class="fas fa-hiking me-1"></i> Book Now
+												</a>
+
+												<button class="btn btn-outline-success">
+													<i class="fas fa-calendar-alt me-1"></i> Check Availability
+												</button>
+
+												<button class="btn btn-outline-secondary">
+													<i class="fas fa-envelope-open-text me-1"></i> Request Custom Quote
+												</button>
+											</div>
+										</div>
+									</div>
+								</div>
+							}
+						</div>
+					</div>
+				</div>
 
 
-                        </div>
-                    </div>
-                </div>
+		
+				<!-- Itinerary Tab -->
+				<div id="itinerary" class="tab-content" style="display: none;">
+					<div class="container py-3">
+						@if (Model.trekItineraryDays?.Any() == true)
+						{
+							<div class="accordion" id="itineraryAccordion">
+								@foreach (var day in Model.trekItineraryDays.OrderBy(d => d.DayNumber))
+								{
+									var collapseId = $"collapseDay{day.DayNumber}";
+									<div class="accordion-item mb-3 itinerary-day">
+										<h2 class="accordion-header" id="heading@day.DayNumber">
+											<button class="accordion-button collapsed" type="button"
+													data-bs-toggle="collapse"
+													data-bs-target="#@collapseId"
+													aria-expanded="false"
+													aria-controls="@collapseId" 
+													style="font-weight:500; color:#0d0d0d;">
+												Day @day.DayNumber: @day.Title
+											</button>
+										</h2>
+										<div id="@collapseId" class="accordion-collapse collapse"
+											 aria-labelledby="heading@day.DayNumber"
+											 data-bs-parent="#itineraryAccordion">
+											<div class="accordion-body">
+												@Html.Raw(day.Description)
+											</div>
+										</div>
+									</div>
+								}
+							</div>
+						}
+						else
+						{
+							<p class="text-muted">Detailed itinerary will be provided upon booking.</p>
+						}
+					</div>
+				</div>
 
-                <!-- Packing List Tab -->
-                <div id="packing" class="tab-content" style="display: none;">
-                    <h3>Essential Packing List</h3>
 
-                    @if (Model.TrekPackingList != null)
-                    {
-                        @if (!string.IsNullOrEmpty(Model.TrekPackingList))
-                        {
-                            <div class="alert alert-info">
-                                <i class="fas fa-info-circle me-2"></i>@Html.Raw(Model.TrekPackingList)
-                            </div>
-                        }
+				<!-- Inclusions & Exclusions Tab -->
+				<div id="inclusions" class="tab-content" style="display: none;">
+					<div class="container py-3">
+						<div class="card border-success mb-3">
+							<div class="card-header bg-success text-white">
+								<h5 class="mb-0">
+									<i class="fas fa-check-circle me-2"></i>What's Included
+								</h5>
+							</div>
+							<div class="card-body">
+								<p class="mb-0">@Html.Raw(Model.TrekingPackageInclusion)</p>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div id="exclusions" class="tab-content" style="display: none;">
+					<div class="container py-3">
+						<div class="card border-danger mb-3">
+							<div class="card-header bg-danger text-white">
+								<h5 class="mb-0">
+									<i class="fas fa-times-circle me-2"></i>What's Not Included
+								</h5>
+							</div>
+							<div class="card-body">
+								<p class="mb-0">@Html.Raw(Model.TrekingPackageExclusion)</p>
+							</div>
+						</div>
+					</div>
+				</div>
 
 
-                    }
-                </div>
+				<!-- Packing List Tab -->
+				<div id="packing" class="tab-content" style="display: none;">
+					<div class="container py-3">
+						<div class="card border-info mb-3">
+							<div class="card-header bg-info text-white">
+								<h5 class="mb-0">
+									<i class="fas fa-suitcase-rolling me-2"></i>Essential Packing List
+								</h5>
+							</div>
+							<div class="card-body">
+								@if (!string.IsNullOrEmpty(Model.TrekPackingList))
+								{
+									<p class="mb-0">@Html.Raw(Model.TrekPackingList)</p>
+								}
+								else
+								{
+									<p class="text-muted mb-0">A detailed packing list will be provided before departure.</p>
+								}
+							</div>
+						</div>
+					</div>
+				</div>
 
-                <!-- FAQ Tab -->
-                <div id="faq" class="tab-content" style="display: none;">
-                    <h3>Frequently Asked Questions</h3>
-                    @if (Model.FAQs?.Any() == true)
-                    {
 
-                        var faqsByCategory = Model.FAQs.GroupBy(f => f.Category ?? "General").OrderBy(g => g.Key);
+				<!-- FAQ Tab -->
+				<!-- FAQ Tab -->
+				<div id="faq" class="tab-content" style="display: none;">
+					<div class="container py-3">
+						@if (Model.FAQs?.Any() == true)
+						{
+							var faqsByCategory = Model.FAQs.GroupBy(f => f.Category ?? "General").OrderBy(g => g.Key);
 
+							@foreach (var categoryGroup in faqsByCategory)
+							{
+								<h5 class="mt-4 mb-3">@categoryGroup.Key</h5>
 
-                        @foreach (var categoryGroup in faqsByCategory)
-                        {
-                            <h5 class="mt-4 mb-3">@categoryGroup.Key</h5>
-                            @foreach (var faq in categoryGroup)
-                            {
-                                <div class="faq-item">
-                                    <h6 class="faq-question" onclick="toggleFAQ(@faq.GetHashCode())">
-                                        @faq.Question
-                                        <i class="fas fa-chevron-down"></i>
-                                    </h6>
-                                    <div id="faq-@faq.GetHashCode()" class="faq-answer" style="display: none;">
-                                        @faq.Answer
-                                    </div>
-                                </div>
-                            }
-                        }
-                    }
-                    else
-                    {
-                        <p class="text-muted">Have questions? Contact us for detailed information about this trek.</p>
-                    }
-                </div>
-            </div>
-        </div>
-    </section>
+								<div class="accordion mb-3" id="faqAccordion-@categoryGroup.Key.GetHashCode()">
+									@foreach (var faq in categoryGroup)
+									{
+										var collapseId = $"collapseFaq{faq.GetHashCode()}";
+										<div class="accordion-item mb-2 itinerary-day">
+											<h2 class="accordion-header" id="headingFaq@faq.GetHashCode()">
+												<button class="accordion-button collapsed" type="button"
+														data-bs-toggle="collapse"
+														data-bs-target="#@collapseId"
+														aria-expanded="false"
+														aria-controls="@collapseId"
+														style="font-weight:500; color:#0d0d0d;">
+													@faq.Question
+												</button>
+											</h2>
+											<div id="@collapseId" class="accordion-collapse collapse"
+												 aria-labelledby="headingFaq@faq.GetHashCode()"
+												 data-bs-parent="#faqAccordion-@categoryGroup.Key.GetHashCode()">
+												<div class="accordion-body">
+													@Html.Raw(faq.Answer)
+												</div>
+											</div>
+										</div>
+									}
+								</div>
+							}
+						}
+						else
+						{
+							<p class="text-muted">Have questions? Contact us for detailed information about this trek.</p>
+						}
+					</div>
+				</div>
 
-    <!-- Call to Action -->
-    <section class="container mt-5 mb-5">
-        <div class="card bg-success text-white">
-            <div class="card-body text-center p-5">
-                <h3>Ready for Your Himalayan Adventure?</h3>
-                <p class="lead">Join thousands of trekkers who have experienced the magic of Everest Base Camp</p>
-                <div class="d-flex flex-wrap justify-content-center gap-3">
-                    <button class="btn btn-light btn-lg">
-                        <i class="fas fa-calendar me-2"></i>Check Dates & Prices
-                    </button>
-                    <button class="btn btn-outline-light btn-lg">
-                        <i class="fas fa-phone me-2"></i>Talk to Expert
-                    </button>
-                    <button class="btn btn-outline-light btn-lg">
-                        <i class="fas fa-download me-2"></i>Download Brochure
-                    </button>
-                </div>
-            </div>
-        </div>
-    </section>
+			</div>
+		</div>
+	</section>
 
-    <script>
+	<!-- Call to Action -->
+	<section class="container mt-5 mb-5">
+		<div class="card bg-success text-white">
+			<div class="card-body text-center p-5">
+				<h3>Ready for Your Himalayan Adventure?</h3>
+				<p class="lead">Join thousands of trekkers who have experienced the magic of Everest Base Camp</p>
+				<div class="d-flex flex-wrap justify-content-center gap-3">
+					<button class="btn btn-light btn-lg">
+						<i class="fas fa-calendar me-2"></i>Check Dates & Prices
+					</button>
+					<button class="btn btn-outline-light btn-lg">
+						<i class="fas fa-phone me-2"></i>Talk to Expert
+					</button>
+					<button class="btn btn-outline-light btn-lg">
+						<i class="fas fa-download me-2"></i>Download Brochure
+					</button>
+				</div>
+			</div>
+		</div>
+	</section>
 
-        document.addEventListener("DOMContentLoaded", function () {
-            const heroSlides = document.querySelectorAll(".hero-slide");
-            const modalImage = document.getElementById("modalImage");
-            const imageModalEl = document.getElementById("imageModal");
-            const imageModal = new bootstrap.Modal(imageModalEl);
+	<script>
 
-            heroSlides.forEach(slide => {
-                slide.style.cursor = "pointer";
-                slide.addEventListener("click", function () {
-                    const imgSrc = this.getAttribute("data-img");
+		document.addEventListener("DOMContentLoaded", function () {
+			const heroSlides = document.querySelectorAll(".hero-slide");
+			const modalImage = document.getElementById("modalImage");
+			const imageModalEl = document.getElementById("imageModal");
+			const imageModal = new bootstrap.Modal(imageModalEl);
 
-                    // Force clear & reassign so modal always updates
-                    modalImage.src = "";
-                    setTimeout(() => {
-                        modalImage.src = imgSrc;
-                    }, 10);
+			heroSlides.forEach(slide => {
+				slide.style.cursor = "pointer";
+				slide.addEventListener("click", function () {
+					const imgSrc = this.getAttribute("data-img");
 
-                    imageModal.show();
-                });
-            });
+					// Force clear & reassign so modal always updates
+					modalImage.src = "";
+					setTimeout(() => {
+						modalImage.src = imgSrc;
+					}, 10);
 
-            // Optional: clear when modal hides
-            imageModalEl.addEventListener("hidden.bs.modal", () => {
-                modalImage.src = "";
-            });
-        });
+					imageModal.show();
+				});
+			});
 
-        document.addEventListener('DOMContentLoaded', function () {
-            const slides = document.querySelectorAll('.hero-slide');
-            let currentSlide = 0;
+			// Optional: clear when modal hides
+			imageModalEl.addEventListener("hidden.bs.modal", () => {
+				modalImage.src = "";
+			});
+		});
 
-            function nextSlide() {
-                slides[currentSlide].classList.remove('active');
-                currentSlide = (currentSlide + 1) % slides.length;
-                slides[currentSlide].classList.add('active');
-            }
+		document.addEventListener('DOMContentLoaded', function () {
+			const slides = document.querySelectorAll('.hero-slide');
+			let currentSlide = 0;
 
-            if (slides.length > 1) {
-                slides[0].classList.add('active'); // make sure first slide is visible
-                setInterval(nextSlide, 5000); // change every 5s
-            }
-        });
+			function nextSlide() {
+				slides[currentSlide].classList.remove('active');
+				currentSlide = (currentSlide + 1) % slides.length;
+				slides[currentSlide].classList.add('active');
+			}
 
-        function showTab(tabName) {
-            // Hide all tab contents
-            const contents = document.querySelectorAll('.tab-content');
-            contents.forEach(content => content.style.display = 'none');
+			if (slides.length > 1) {
+				slides[0].classList.add('active'); // make sure first slide is visible
+				setInterval(nextSlide, 5000); // change every 5s
+			}
+		});
 
-            // Remove active class from all buttons
-            const buttons = document.querySelectorAll('.tab-button');
-            buttons.forEach(btn => btn.classList.remove('active'));
+		function showTab(tabName) {
+			// Hide all tab contents
+			const contents = document.querySelectorAll('.tab-content');
+			contents.forEach(content => content.style.display = 'none');
 
-            // Show selected tab and mark button as active
-            document.getElementById(tabName).style.display = 'block';
-            event.target.classList.add('active');
-        }
+			// Remove active class from all buttons
+			const buttons = document.querySelectorAll('.tab-button');
+			buttons.forEach(btn => btn.classList.remove('active'));
 
-        function toggleFAQ(faqId) {
-            const faqAnswer = document.getElementById(`faq-${faqId}`);
-            const icon = event.target.querySelector('i');
+			// Show selected tab and mark button as active
+			document.getElementById(tabName).style.display = 'block';
+			event.target.classList.add('active');
+		}
 
-            if (faqAnswer.style.display === 'none' || faqAnswer.style.display === '') {
-                faqAnswer.style.display = 'block';
-                icon.classList.remove('fa-chevron-down');
-                icon.classList.add('fa-chevron-up');
-            } else {
-                faqAnswer.style.display = 'none';
-                icon.classList.remove('fa-chevron-up');
-                icon.classList.add('fa-chevron-down');
-            }
-        }
-        function toggleItinerary(header) {
-            // The paragraph is the next sibling after the header
-            const desc = header.nextElementSibling;
+		// function toggleFAQ(faqId) {
+		// 	const faqAnswer = document.getElementById(`faq-${faqId}`);
+		// 	const icon = event.target.querySelector('i');
 
-            // Toggle display
-            if (desc.style.display === "none" || desc.style.display === "") {
-                desc.style.display = "block";
-            } else {
-                desc.style.display = "none";
-            }
-        }
-        // Auto-scroll to sections when needed
-        document.addEventListener('DOMContentLoaded', function () {
-            // Check if there's a hash in URL for direct section access
-            if (window.location.hash) {
-                const section = window.location.hash.substring(1);
-                if (document.getElementById(section)) {
-                    showTab(section);
-                }
-            }
-        });
-    </script>
+		// 	if (faqAnswer.style.display === 'none' || faqAnswer.style.display === '') {
+		// 		faqAnswer.style.display = 'block';
+		// 		icon.classList.remove('fa-chevron-down');
+		// 		icon.classList.add('fa-chevron-up');
+		// 	} else {
+		// 		faqAnswer.style.display = 'none';
+		// 		icon.classList.remove('fa-chevron-up');
+		// 		icon.classList.add('fa-chevron-down');
+		// 	}
+		// }
+		// function toggleItinerary(header) {
+		// 	// The paragraph is the next sibling after the header
+		// 	const desc = header.nextElementSibling;
+
+		// 	// Toggle display
+		// 	if (desc.style.display === "none" || desc.style.display === "") {
+		// 		desc.style.display = "block";
+		// 	} else {
+		// 		desc.style.display = "none";
+		// 	}
+		// }
+		// Auto-scroll to sections when needed
+		document.addEventListener('DOMContentLoaded', function () {
+			// Check if there's a hash in URL for direct section access
+			if (window.location.hash) {
+				const section = window.location.hash.substring(1);
+				if (document.getElementById(section)) {
+					showTab(section);
+				}
+			}
+		});
+	</script>
 
 </body>
 </html>
